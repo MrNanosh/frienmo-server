@@ -3,5 +3,5 @@ CREATE TABLE outstanding(
     favor_id INTEGER REFERENCES favor(id) ON DELETE CASCADE,
     users_id INTEGER REFERENCES user(id) ON DELETE CASCADE,
     reciever_redeemed BOOLEAN,
-    giver_redeemed BOOLEAN,
+    giver_redeemed BOOLEAN
 );
