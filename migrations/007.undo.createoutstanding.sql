@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS outstanding;
+DROP TABLE IF EXISTS "outstanding";

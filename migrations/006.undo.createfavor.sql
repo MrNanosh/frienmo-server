@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS favor;
+DROP TABLE IF EXISTS "favor";

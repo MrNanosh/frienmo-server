@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS publicity;
+DROP TABLE IF EXISTS "publicity";

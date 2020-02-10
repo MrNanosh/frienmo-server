@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "predeploy": "npm audit",
     "deploy": "git push heroku master",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "migrate": "postgrator --config postgrator-config.js"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,7 @@
     "chai": "^4.2.0",
     "mocha": "^6.2.2",
     "nodemon": "^2.0.1",
+    "postgrator-cli": "^3.2.0",
     "supertest": "^4.0.2"
   }
 }
