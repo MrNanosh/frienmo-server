@@ -3,28 +3,29 @@ CREATE TABLE "category"(
     "cat_name" TEXT
 );
 
---INSERT INTO "category"(
-    --('sports'),
-   -- ('family'),
-   -- ('kids'),
-   -- ('volunteers needed'),
-   -- ('pets'),
-   -- ('emergency'),
-   -- ('health'),
-   -- ('food'),
-  --  ('relationship'),
-   -- ('advice'),
-    --('travel'),
-  --  ('wedding'),
-  --  ('career'),
-  --  ('needs fixing'),
-  --  ('community'),
-  --  ('education'),
-  --  ('gaming'),
-  --  ('IT'),
-  --  ('plants'),
- --   ('creative'),
-  --  ('misc'),
- --   ('religion & spirituality'),
- --   ('ridesharing')
---);
+INSERT INTO "category" ("cat_name")
+VALUES
+    ('sports'),
+    ('family'),
+    ('kids'),
+    ('volunteers needed'),
+    ('pets'),
+    ('emergency'),
+    ('health'),
+   ('food'),
+  ('relationship'),
+    ('advice'),
+    ('travel'),
+  ('wedding'),
+    ('career'),
+    ('needs fixing'),
+    ('community'),
+    ('education'),
+    ('gaming'),
+    ('IT'),
+    ('plants'),
+    ('creative'),
+   ('misc'),
+    ('religion & spirituality'),
+    ('ridesharing')
+;

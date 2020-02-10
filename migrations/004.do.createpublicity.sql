@@ -3,8 +3,9 @@ CREATE TABLE "publicity"(
     "title" TEXT
 );
 
---INSERT INTO "publicity"(
-   -- ('dm'),
-  --  ('friends'),
-   -- ('public')
---);
+INSERT INTO "publicity"("title")
+VALUES
+    ('dm'),
+    ('friends'),
+    ('public')
+;
