@@ -3,5 +3,4 @@ CREATE TABLE review(
     reviewer INTEGER REFERENCES user(id) ON DELETE CASCADE,
     reviewee INTEGER REFERENCES user(id) ON DELETE CASCADE,
     comment TEXT,
-    rating INTEGER
 );
