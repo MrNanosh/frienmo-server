@@ -41,7 +41,7 @@ const UserService = {
       username: user.username,
     }
   },
-  populateUserWords(db, user_id) {
+  /*populateUserWords(db, user_id) {
     return db.transaction(async trx => {
       const [languageId] = await trx
         .into('language')
@@ -90,7 +90,7 @@ const UserService = {
           head: languageHeadId.id,
         })
     })
-  },
+  },*/
 }
 
 module.exports = UserService

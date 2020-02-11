@@ -4,7 +4,7 @@ CREATE TABLE "favor"(
     "description" TEXT,
     "creator_id" INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
     "expiration_date" TIMESTAMP,
-    "public" BOOLEAN,
+    "public" INTEGER REFERENCES "publicity"(id) ON DELETE CASCADE,
     "user_location" TEXT,
     "tags" TEXT,
     "category" INTEGER REFERENCES "category"(id),
