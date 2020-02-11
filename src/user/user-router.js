@@ -14,6 +14,13 @@ userRouter
         return res.status(400).json({
           error: `Missing '${field}' in request body`
         })
+
+    if(!description){
+      description = '';
+    }
+    if(!phone){
+      phone = '';
+    }
     try {
       const passwordError = UserService.validatePassword(password)
 

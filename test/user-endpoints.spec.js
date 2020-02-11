@@ -231,7 +231,7 @@ describe('User Endpoints', function () {
     })
   })
 
-  describe.only(`GET /api/user/`, () =>{
+  describe(`GET /api/user/`, () =>{
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
 
     it('returns all users, but only their username and name', () =>{
@@ -239,7 +239,6 @@ describe('User Endpoints', function () {
       .get('/api/user')
       .expect(200)
       .expect(res =>{
-        console.log(res.body);
         expect(res.body[0]).to.have.keys('username', 'name')
         testUsers.forEach((user, index) =>{
           user = res.body[index];
@@ -247,6 +246,24 @@ describe('User Endpoints', function () {
           expect(user).to.have.property('name', testUsers[index].name);
         });
       });
+    })
+  })
+
+  describe('GET /api/user/:id', () =>{
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
+
+    it('only returns user 1s username, name, description and phone#', () =>{
+      return supertest(app)
+      .get('/api/user/1')
+      .expect(200)
+      .expect(res =>{
+        expect(res.body).to.have.keys('username', 'name', 'description', 'phone');
+        expect(res.body).to.have.property('username', testUsers[0].username);
+        expect(res.body).to.have.property('name', testUsers[0].name);
+        expect(res.body).to.have.property('description', testUsers[0].description);
+        expect(res.body).to.have.property('phone', testUsers[0].phone);
+
+      })
     })
   })
 })
