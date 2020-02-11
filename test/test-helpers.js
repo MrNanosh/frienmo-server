@@ -22,14 +22,16 @@ function makeUsersArray() {
     {
       id: 1,
       username: 'test-user-1',
-      name: 'Test user 1',
+      real_name: 'Test user 1',
       password: 'password',
+      phone: '1234567890'
     },
     {
       id: 2,
       username: 'test-user-2',
-      name: 'Test user 2',
+      real_name: 'Test user 2',
       password: 'password',
+      phone: '1234567890'
     },
   ]
 }
@@ -39,54 +41,80 @@ function makeUsersArray() {
  * @param {object} user - contains `id` property
  * @returns {Array(languages, words)} - arrays of languages and words
  */
-function makeLanguagesAndWords(user) {
-  const languages = [
-    {
-      id: 1,
-      name: 'Test language 1',
-      user_id: user.id,
-    },
-  ]
+function makeUsersAndFavors() {
 
-  const words = [
+
+  const outstanding = [
+      {
+       id: 1,
+       favor_id: 1,
+       users_id: 1,
+       reciever_id: 2,
+       reciever_redeemed: true,
+       giver_redeemed: true,
+      },
+      {
+        id: 2,
+        favor_id: 2,
+        users_id: 2,
+        reciever_id: 2,
+        reciever_redeemed: true,
+        giver_redeemed: false,
+       },
+       {
+        id: 3,
+        favor_id: 3,
+        users_id: 3,
+        reciever_id: 2,
+        reciever_redeemed: false,
+        giver_redeemed: false,
+       },
+  ]
+  const friend = [
+    {
+      user_id: 1,
+      friend_id: 2,
+      accepted: true
+    },
+    {
+      user_id: 2,
+      friend_id: 1,
+      accepted: true
+      },
+
+  ]
+  const review = [
+   { id: 1,
+    reviewer: 1,
+    reviewee: 2,
+    comment: 'testcomment'
+   }, 
+   { id: 2,
+    reviewer: 2,
+    reviewee: 1,
+    comment: 'testcomment'
+   }, 
+  ]
+  
+  const favor = [
     {
       id: 1,
-      original: 'original 1',
-      translation: 'translation 1',
-      language_id: 1,
-      next: 2,
+      title: 'title 1',
+      description: 'description 1',
+      creator_id: 1,
+      expiration_date: 2,
     },
     {
       id: 2,
-      original: 'original 2',
-      translation: 'translation 2',
-      language_id: 1,
-      next: 3,
+      title: 'title 2',
+      description: 'description 2',
+      creator_id: 2,
+      expiration_date: '',
     },
-    {
-      id: 3,
-      original: 'original 3',
-      translation: 'translation 3',
-      language_id: 1,
-      next: 4,
-    },
-    {
-      id: 4,
-      original: 'original 4',
-      translation: 'translation 4',
-      language_id: 1,
-      next: 5,
-    },
-    {
-      id: 5,
-      original: 'original 5',
-      translation: 'translation 5',
-      language_id: 1,
-      next: null,
-    },
+   
   ]
 
-  return [languages, words]
+  return [favor, review, friend, outstanding]
 }
 
 /**
@@ -112,18 +140,24 @@ function cleanTables(db) {
   return db.transaction(trx =>
     trx.raw(
       `TRUNCATE
-        "word",
-        "language",
-        "user"`
+        "user",
+        "favor",
+        "outstanding",
+        "friend",
+        "review",
+        `
       )
       .then(() =>
         Promise.all([
-          trx.raw(`ALTER SEQUENCE word_id_seq minvalue 0 START WITH 1`),
-          trx.raw(`ALTER SEQUENCE language_id_seq minvalue 0 START WITH 1`),
           trx.raw(`ALTER SEQUENCE user_id_seq minvalue 0 START WITH 1`),
-          trx.raw(`SELECT setval('word_id_seq', 0)`),
-          trx.raw(`SELECT setval('language_id_seq', 0)`),
+          trx.raw(`ALTER SEQUENCE favor_id_seq minvalue 0 START WITH 1`),
+          trx.raw(`ALTER SEQUENCE outstanding_id_seq minvalue 0 START WITH 1`),
+          trx.raw(`ALTER SEQUENCE review_id_seq minvalue 0 START WITH 1`),
           trx.raw(`SELECT setval('user_id_seq', 0)`),
+          trx.raw(`SELECT setval('favor_id_seq', 0)`),
+          trx.raw(`SELECT setval('outstanding_id_seq', 0)`),
+          trx.raw(`SELECT setval('review_id_seq', 0)`),
+
         ])
       )
   )
@@ -154,33 +188,45 @@ function seedUsers(db, users) {
  * seed the databases with words and update sequence counter
  * @param {knex instance} db
  * @param {array} users - array of user objects for insertion
- * @param {array} languages - array of languages objects for insertion
- * @param {array} words - array of words objects for insertion
+ * @param {array} favor - array of favors objects for insertion
+ * @param {array} outstanding - array of outstanding objects for insertion
+ * @param {array} review - array of review objects for insertion
+
  * @returns {Promise} - when all tables seeded
  */
-async function seedUsersLanguagesWords(db, users, languages, words) {
+async function seedUsersFavor(db, users, favor, outstanding, review, ) {
   await seedUsers(db, users)
 
   await db.transaction(async trx => {
-    await trx.into('language').insert(languages)
-    await trx.into('word').insert(words)
+    await trx.into('favor').insert(favor)
+    await trx.into('outstanding').insert(outstanding)
+    await trx.into('review').insert(review)
 
-    const languageHeadWord = words.find(
-      w => w.language_id === languages[0].id
+
+    const favorDescrip = favor.find(
+      fav => fav.creator_id === favor[0].id
     )
 
     await trx('language')
-      .update({ head: languageHeadWord.id })
-      .where('id', languages[0].id)
+      .update({ head: favorDescrip.id })
+      .where('id', favor[0].id)
 
     await Promise.all([
       trx.raw(
-        `SELECT setval('language_id_seq', ?)`,
-        [languages[languages.length - 1].id],
+        `SELECT setval('user_id_seq', ?)`,
+        [user[user.length - 1].id],
       ),
       trx.raw(
-        `SELECT setval('word_id_seq', ?)`,
-        [words[words.length - 1].id],
+        `SELECT setval('favor_id_seq', ?)`,
+        [favor[favor.length - 1].id],
+      ),
+      trx.raw(
+        `SELECT setval('outstanding_id_seq', ?)`,
+        [outstanding[outstanding.length - 1].id],
+      ),
+      trx.raw(
+        `SELECT setval('review_id_seq', ?)`,
+        [review[review.length - 1].id],
       ),
     ])
   })
@@ -189,9 +235,9 @@ async function seedUsersLanguagesWords(db, users, languages, words) {
 module.exports = {
   makeKnexInstance,
   makeUsersArray,
-  makeLanguagesAndWords,
+  makeUsersAndFavors,
   makeAuthHeader,
   cleanTables,
   seedUsers,
-  seedUsersLanguagesWords,
+  seedUsersFavor,
 }
