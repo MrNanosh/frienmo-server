@@ -1,26 +1,128 @@
-# Express Boilerplate!
+# Frenmo (working title)
 
-This is a boilerplate project used for starting new projects!
+## Summary
 
-## Set up
+## Technologies used
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+## links
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+client github repo: https://github.com/MrNanosh/frienmo-client
 
-## Scripts
+api github repo: https://github.com/MrNanosh/frienmo-server
 
-Start the application `npm start`
+## API
 
-Start nodemon for the application `npm run dev`
+---
 
-Run the tests `npm test`
+---
 
-## Deploying
+### api/user
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+---
+
+#### GET api/user/:id
+
+gets information about particular users
+
+#### GET api/user
+
+returns an array of users with name and username
+
+#### POST api/user
+
+creates a new user and returns a json with the users name and username.
+
+returns the location of the user
+
+### api/friend
+
+---
+
+#### GET api/friend
+
+gets a list of friends for a particular user:
+user must be authorized otherwise returns a 401
+
+#### POST api/friend/:id <i>protected</i>
+
+make an association with the authorized user with the user in the request
+parameter
+
+#### PATCH api/friend/:id
+
+changes the accepted parameter to true
+
+should only be used in the case of accepting a request to be friends
+should not be able to patch a accepted property to false.
+attempting to patch accepted as false will return a 401
+
+#### DELETE api/friend/:id
+
+deletes the friend (not their account but the association)
+should be used in the event of declining a request for friend
+
+### api/review
+
+---
+
+#### GET api/review/user/:user_id
+
+gets all the reviews for the specified user only
+
+#### GET api/review/:id
+
+gets a specific review
+
+#### POST api/review
+
+makes a new review and returns the location of the review
+
+#### PATCH api/review/:id
+
+#### DELETE api/review/:id
+
+### api/favor
+
+---
+
+#### GET api/favor/:id
+
+will return an object with the specified favor.
+
+#### GET api/favor/friend
+
+gets favors that were posted among your friends and not just the general public
+
+#### GET api/favor
+
+gets a paginated list of favors from the local community.
+Does not show
+
+#### GET api/favor/personal
+
+gets a list of favors created by the user, issued by the user, or received by the user
+
+#### PATCH api/favor/:id
+
+allowed: patching of certain fields under certain conditions:
+allowed: increase the expiration date of a favor that has receiver_id set
+allowed: update any field if favor_outstanding does not reference its id
+
+This method should be used to update the giver and receiver of a favor in
+favor_outstanding. if a favor is not outstanding and giver and receiver id is in the body then it will
+add a row for it in favor_outstanding. The limit of that favor to be issued
+will stop the patch if there is an attempt to go over. An error will be thrown in this case.
+
+#### DELETE api/favor/:id
+
+an authorized user may delete a favor if favor_outstanding does not reference its id
+
+### api/category
+
+---
+
+#### GET api/category
+
+only gets are allowed for this
+
+gets a list of categories and their ids
