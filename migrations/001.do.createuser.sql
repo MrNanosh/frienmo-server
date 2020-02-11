@@ -5,5 +5,6 @@ CREATE TABLE "user" (
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "phone" TEXT
+    "phone" TEXT,
+    "description" TEXT
 );

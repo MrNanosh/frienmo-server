@@ -230,4 +230,23 @@ describe('User Endpoints', function () {
       })*/
     })
   })
+
+  describe.only(`GET /api/user/`, () =>{
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
+
+    it('returns all users, but only their username and name', () =>{
+      return supertest(app)
+      .get('/api/user')
+      .expect(200)
+      .expect(res =>{
+        console.log(res.body);
+        expect(res.body[0]).to.have.keys('username', 'name')
+        testUsers.forEach((user, index) =>{
+          user = res.body[index];
+          expect(user).to.have.property('username', testUsers[index].username);
+          expect(user).to.have.property('name', testUsers[index].name);
+        });
+      });
+    })
+  })
 })

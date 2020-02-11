@@ -7,7 +7,7 @@ const jsonBodyParser = express.json()
 
 userRouter
   .post('/', jsonBodyParser, async (req, res, next) => {
-    const { password, username, name, phone } = req.body
+    const { password, username, name, phone, description } = req.body
 
     for (const field of ['name', 'username', 'password'])
       if (!req.body[field])
@@ -35,17 +35,13 @@ userRouter
         password: hashedPassword,
         name,
         phone,
+        description,
       }
 
       const user = await UserService.insertUser(
         req.app.get('db'),
         newUser
       )
-
-      /*await UserService.populateUserWords(
-        req.app.get('db'),
-        user.id
-      )*/
 
       res
         .status(201)
@@ -55,5 +51,16 @@ userRouter
       next(error)
     }
   })
+  //returns all users: username, name
+  .get('/', (req, res) =>{
+      UserService.getAllUsers(req.app.get('db'))
+      .then(result =>{
+      res.json(result);
+      })
+      
+  })
+  //return one user with id: username, name, description, phone#
+  .get('/:id')
+  
 
 module.exports = userRouter
