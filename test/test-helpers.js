@@ -1,15 +1,17 @@
 const knex = require('knex')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { DATABASE_TEST_URL } = require('../src/config')
 
 /**
  * create a knex instance connected to postgres
  * @returns {knex instance}
  */
 function makeKnexInstance() {
+  console.log('url is', DATABASE_TEST_URL);
   return knex({
     client: 'pg',
-    connection: process.env.TEST_DB_URL,
+    connection: DATABASE_TEST_URL,
   })
 }
 
@@ -144,7 +146,7 @@ function cleanTables(db) {
         "favor",
         "outstanding",
         "friend",
-        "review",
+        "review"
         `
       )
       .then(() =>
@@ -194,22 +196,19 @@ function seedUsers(db, users) {
 
  * @returns {Promise} - when all tables seeded
  */
-async function seedUsersFavor(db, users, favor, outstanding, review, ) {
+async function seedUsersFavor(db, users, favor, outstanding, review, friend) {
   await seedUsers(db, users)
 
   await db.transaction(async trx => {
     await trx.into('favor').insert(favor)
     await trx.into('outstanding').insert(outstanding)
     await trx.into('review').insert(review)
+    await trx.into('friend').insert(friend)
 
 
     const favorDescrip = favor.find(
       fav => fav.creator_id === favor[0].id
     )
-
-    await trx('language')
-      .update({ head: favorDescrip.id })
-      .where('id', favor[0].id)
 
     await Promise.all([
       trx.raw(
