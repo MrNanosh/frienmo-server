@@ -206,7 +206,7 @@ async function seedUsersFavor(db, users, favor, outstanding, review, friend) {
     await trx.into('friend').insert(friend)
 
 
-    const favorDescrip = favor.find(
+    const favor = favor.find(
       fav => fav.creator_id === favor[0].id
     )
 
