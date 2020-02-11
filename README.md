@@ -12,13 +12,31 @@ api github repo: https://github.com/MrNanosh/frienmo-server
 
 ## API
 
+---
+
+---
+
 ### api/user
+
+---
 
 #### GET api/user/:id
 
 gets information about particular users
 
+#### GET api/user
+
+returns an array of users with name and username
+
+#### POST api/user
+
+creates a new user and returns a json with the users name and username.
+
+returns the location of the user
+
 ### api/friend
+
+---
 
 #### GET api/friend
 
@@ -45,6 +63,66 @@ should be used in the event of declining a request for friend
 
 ### api/review
 
+---
+
+#### GET api/review/user/:user_id
+
+gets all the reviews for the specified user only
+
+#### GET api/review/:id
+
+gets a specific review
+
+#### POST api/review
+
+makes a new review and returns the location of the review
+
+#### PATCH api/review/:id
+
+#### DELETE api/review/:id
+
 ### api/favor
 
+---
+
+#### GET api/favor/:id
+
+will return an object with the specified favor.
+
+#### GET api/favor/friend
+
+gets favors that were posted among your friends and not just the general public
+
+#### GET api/favor
+
+gets a paginated list of favors from the local community.
+Does not show
+
+#### GET api/favor/personal
+
+gets a list of favors created by the user, issued by the user, or received by the user
+
+#### PATCH api/favor/:id
+
+allowed: patching of certain fields under certain conditions:
+allowed: increase the expiration date of a favor that has receiver_id set
+allowed: update any field if favor_outstanding does not reference its id
+
+This method should be used to update the giver and receiver of a favor in
+favor_outstanding. if a favor is not outstanding and giver and receiver id is in the body then it will
+add a row for it in favor_outstanding. The limit of that favor to be issued
+will stop the patch if there is an attempt to go over. An error will be thrown in this case.
+
+#### DELETE api/favor/:id
+
+an authorized user may delete a favor if favor_outstanding does not reference its id
+
 ### api/category
+
+---
+
+#### GET api/category
+
+only gets are allowed for this
+
+gets a list of categories and their ids
