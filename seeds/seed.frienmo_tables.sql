@@ -5,7 +5,7 @@ TRUNCATE
     RESTART IDENTITY CASCADE;
 
 INSERT INTO user ( 
-    username, password,real_name,phone
+    username, password,name,phone
 )
 VALUES
 ('admin','pass','real admin','734123456'),
