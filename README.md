@@ -1,26 +1,50 @@
-# Express Boilerplate!
+# Frenmo (working title)
 
-This is a boilerplate project used for starting new projects!
+## Summary
 
-## Set up
+## Technologies used
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+## links
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+client github repo: https://github.com/MrNanosh/frienmo-client
 
-## Scripts
+api github repo: https://github.com/MrNanosh/frienmo-server
 
-Start the application `npm start`
+## API
 
-Start nodemon for the application `npm run dev`
+### api/user
 
-Run the tests `npm test`
+#### GET api/user/:id
 
-## Deploying
+gets information about particular users
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.
+### api/friend
+
+#### GET api/friend
+
+gets a list of friends for a particular user:
+user must be authorized otherwise returns a 401
+
+#### POST api/friend/:id <i>protected</i>
+
+make an association with the authorized user with the user in the request
+parameter
+
+#### PATCH api/friend/:id
+
+changes the accepted parameter to true
+
+should only be used in the case of accepting a request to be friends
+should not be able to patch a accepted property to false.
+attempting to patch accepted as false will return a 401
+
+#### DELETE api/friend/:id
+
+deletes the friend (not their account but the association)
+should be used in the event of declining a request for friend
+
+### api/review
+
+### api/favor
+
+### api/category
