@@ -252,6 +252,12 @@ describe('User Endpoints', function () {
   describe('GET /api/user/:id', () =>{
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
 
+    it('returns 404 if userid is invalid', () =>{
+      return supertest(app)
+      .get('/api/user/3')
+      .expect(404);
+    })
+
     it('only returns user 1s username, name, description and phone#', () =>{
       return supertest(app)
       .get('/api/user/1')

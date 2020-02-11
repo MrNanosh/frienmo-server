@@ -46,6 +46,9 @@ const UserService = {
       .then(res =>{
         return res;
       })
+  },
+  getUserById(db, id){
+    return db.select(['username', 'name', 'phone', 'description']).from('user').where('id', id).first()
   }
 }
 

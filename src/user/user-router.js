@@ -7,7 +7,7 @@ const jsonBodyParser = express.json()
 
 userRouter
   .post('/', jsonBodyParser, async (req, res, next) => {
-    const { password, username, name, phone, description } = req.body
+    let { password, username, name, phone, description } = req.body
 
     for (const field of ['name', 'username', 'password'])
       if (!req.body[field])
@@ -67,7 +67,16 @@ userRouter
       
   })
   //return one user with id: username, name, description, phone#
-  .get('/:id')
+  .get('/:id', (req, res) =>{
+    const {id} = req.params
+    UserService.getUserById(req.app.get('db'), id)
+    .then(result =>{
+      if(!result){
+        res.status(404).send({error: 'user not found'})
+      }
+      res.json(result);
+    })
+  })
   
 
 module.exports = userRouter
