@@ -24,14 +24,14 @@ function makeUsersArray() {
     {
       id: 1,
       username: 'test-user-1',
-      real_name: 'Test user 1',
+      name: 'Test user 1',
       password: 'password',
       phone: '1234567890'
     },
     {
       id: 2,
       username: 'test-user-2',
-      real_name: 'Test user 2',
+      name: 'Test user 2',
       password: 'password',
       phone: '1234567890'
     },

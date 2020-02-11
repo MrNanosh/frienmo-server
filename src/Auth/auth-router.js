@@ -8,6 +8,7 @@ const jsonBodyParser = express.json()
 authRouter
   .route('/token')
   .post(jsonBodyParser, async (req, res, next) => {
+    console.log('in');
     const { username, password } = req.body
     const loginUser = { username, password }
     for (const [key, value] of Object.entries(loginUser))
@@ -15,8 +16,9 @@ authRouter
         return res.status(400).json({
           error: `Missing '${key}' in request body`
         })
-
+        console.log('in');
     try {
+      console.log('in');
       const dbUser = await AuthService.getUserWithUserName(
         req.app.get('db'),
         loginUser.username
@@ -40,8 +42,9 @@ authRouter
       const sub = dbUser.username
       const payload = {
         user_id: dbUser.id,
-        real_name: dbUser.real_name,
+        name: dbUser.name,
       }
+      console.log('out');
       res.send({
         authToken: AuthService.createJwt(sub, payload),
       })
@@ -54,7 +57,7 @@ authRouter
     const sub = req.user.username
     const payload = {
       user_id: req.user.id,
-      real_name: req.user.real_name,
+      name: req.user.name,
     }
     res.send({
       authToken: AuthService.createJwt(sub, payload),

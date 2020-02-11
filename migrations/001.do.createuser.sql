@@ -4,6 +4,6 @@ CREATE TABLE "user" (
     "fav_requested" INTEGER DEFAULT 0,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "real_name" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "phone" TEXT NOT NULL
 );
