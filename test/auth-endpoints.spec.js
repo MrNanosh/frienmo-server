@@ -100,7 +100,7 @@ describe('Auth Endpoints', function () {
       )
     )
 
-    it.only(`responds 200 and JWT auth token using secret`, () => {
+    it(`responds 200 and JWT auth token using secret`, () => {
       const expectedToken = jwt.sign(
         { user_id: testUser.id, name: testUser.name },
         process.env.JWT_SECRET,

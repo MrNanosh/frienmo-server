@@ -8,7 +8,6 @@ const { DATABASE_TEST_URL } = require('../src/config')
  * @returns {knex instance}
  */
 function makeKnexInstance() {
-  console.log('url is', DATABASE_TEST_URL);
   return knex({
     client: 'pg',
     connection: DATABASE_TEST_URL,
