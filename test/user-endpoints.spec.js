@@ -22,7 +22,7 @@ describe('User Endpoints', function () {
   /**
    * @description Register a user and populate their fields
    **/
-  describe.skip(`POST /api/user`, () => {
+  describe(`POST /api/user`, () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
 
     const requiredFields = ['username', 'password', 'name']
