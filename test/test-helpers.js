@@ -81,7 +81,17 @@ function makeUsersAndFavors() {
       user_id: 2,
       friend_id: 1,
       accepted: true
-      },
+    },
+    {
+      user_id: 1,
+      friend_id: 2,
+      accepted: true
+    },
+    {
+      user_id: 2,
+      friend_id: 1,
+      accepted: false
+    },
 
   ]
   const review = [
