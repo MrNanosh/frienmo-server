@@ -20,14 +20,18 @@ const FriendService = {
             
         })
     },
-    makeFriend(db, user_id, friend_id){
-
+    makeFriend(db, friend, friend2){
+        return db.insert(friend2).into('friend').returning('*').then(() =>{
+            return db.insert(friend).into('friend').returning('*').then(rows =>{
+                return rows[0]
+            });
+        });
     },
     confirmFriend(db, user_id, friend_id){
 
     },
     deleteFriend(db, user_id, friend_id){
-        
+
     }
 }
 

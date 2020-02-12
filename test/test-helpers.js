@@ -216,19 +216,14 @@ async function seedUsersFavor(db, users, favor, outstanding, review, friend) {
   await seedUsers(db, users)
 
   await db.transaction(async trx => {
-//    console.log(favor, outstanding, review);
     await trx.into('favor').insert(favor)
- //   console.log(1);
     await trx.into('outstanding').insert(outstanding)
-  //  console.log(1);
     await trx.into('review').insert(review)
     await trx.into('friend').insert(friend)
-  //  console.log(1);
 
     const favorDescrip = favor.find(
       fav => fav.creator_id === favor[0].id
     )
-    console.log('in')
     await Promise.all([
       trx.raw(
         `SELECT setval('user_id_seq', ?)`,
@@ -248,7 +243,6 @@ async function seedUsersFavor(db, users, favor, outstanding, review, friend) {
       ),
     ])
   })
-  console.log('done')
 }
 
 module.exports = {

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
-describe('Auth Endpoints', function () {
+describe.only('Auth Endpoints', function () {
     let db
 
     const testUsers = helpers.makeUsersArray()
@@ -42,7 +42,6 @@ describe('Auth Endpoints', function () {
                 .set('Authorization', helpers.makeAuthHeader(testUser))
                 .expect(200)
                 .expect(res => {
-                    console.log('resbody is ', res.body);
                     expect(res.body).to.have.length(1);
                     expect(res.body[0]).to.have.keys('user_id', 'friend_id', 'accepted')
                     expect(res.body[0]).to.have.property('user_id', 1)
@@ -53,7 +52,7 @@ describe('Auth Endpoints', function () {
     })
 
     describe('POST /api/friend', () => {
-        beforeEach('insert users', () =>
+        beforeEach('insert users, favors, friends, etc', () =>
             helpers.seedUsersFavor(
                 db,
                 testUsers,
@@ -64,11 +63,29 @@ describe('Auth Endpoints', function () {
             )
         )
         it('makes a new friend request with one accepted and the other unaccepted', () => {
+            const friendToFriend ={
+                friend_id: 3
+            }
+            const friendReturn ={
+                user_id: 2,
+                friend_id: 3,
+                accepted: true
+            }
             return supertest(app)
                 .post('/api/friend')
-                .set('Authorization', helpers.makeAuthHeader(testUser))
+                .set('Authorization', helpers.makeAuthHeader(testUsers[1]))
+                .send(friendToFriend)
                 .expect(201)
-
+                .expect(friendReturn)
+                .expect(res =>{
+                    db.select('*').from('friend').where('user_id', 3)
+                    .then(result =>{
+                        expect(result[1]).to.have.keys('user_id', 'friend_id', 'accepted')
+                        expect(result[1]).to.have.property('user_id', 3)
+                        expect(result[1]).to.have.property('friend_id', 2)
+                        expect(result[1]).to.have.property('accepted', false)
+                    })
+                })
         })
     })
 
