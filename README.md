@@ -43,12 +43,17 @@ returns the location of the user
 gets a list of friends for a particular user:
 user must be authorized otherwise returns a 401
 
+
+
 #### POST api/friend <i>protected</i>
+
 
 make an association with the authorized user with the user in the request
 parameter
 
+
 body takes the id of the friend
+
 
 #### PATCH api/friend/:id
 
@@ -58,7 +63,9 @@ should only be used in the case of accepting a request to be friends
 should not be able to patch a accepted property to false.
 attempting to patch accepted as false will return a 401
 
+
 id is the id of friend request.
+
 
 #### DELETE api/friend/:id
 

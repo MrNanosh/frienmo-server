@@ -6,6 +6,7 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const app = express()
 const authRouter = require('./Auth/auth-router')
+const userRouter = require('./user/user-router')
 
 const morganOption = (NODE_ENV === 'production')
     ? 'tiny'
@@ -17,6 +18,7 @@ app.use(cors())
 
 
 app.use('/api/auth', authRouter)
+app.use('/api/user', userRouter)
 
 app.use(function errorHandler(error, req, res, next) {
     let response

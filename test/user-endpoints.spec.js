@@ -22,7 +22,7 @@ describe('User Endpoints', function () {
   /**
    * @description Register a user and populate their fields
    **/
-  describe.skip(`POST /api/user`, () => {
+  describe(`POST /api/user`, () => {
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
 
     const requiredFields = ['username', 'password', 'name']
@@ -165,7 +165,7 @@ describe('User Endpoints', function () {
           )
       })
 
-      it(`inserts 1 language with words for the new user`, () => {
+      /*it(`inserts 1 language with words for the new user`, () => {
         const newUser = {
           username: 'test username',
           password: '11AAaa!!',
@@ -189,9 +189,9 @@ describe('User Endpoints', function () {
           .post('/api/user')
           .send(newUser)
           .then(res =>
-            /*
-            get languages and words for user that were inserted to db
-            */
+            
+            //get languages and words for user that were inserted to db
+            
             db.from('language').select(
               'language.*',
               db.raw(
@@ -227,6 +227,48 @@ describe('User Endpoints', function () {
               expect(dbWords[w].memory_value).to.eql(1)
             })
           })
+      })*/
+    })
+  })
+
+  describe(`GET /api/user/`, () =>{
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
+
+    it('returns all users, but only their username and name', () =>{
+      return supertest(app)
+      .get('/api/user')
+      .expect(200)
+      .expect(res =>{
+        expect(res.body[0]).to.have.keys('username', 'name')
+        testUsers.forEach((user, index) =>{
+          user = res.body[index];
+          expect(user).to.have.property('username', testUsers[index].username);
+          expect(user).to.have.property('name', testUsers[index].name);
+        });
+      });
+    })
+  })
+
+  describe('GET /api/user/:id', () =>{
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
+
+    it('returns 404 if userid is invalid', () =>{
+      return supertest(app)
+      .get('/api/user/3')
+      .expect(404);
+    })
+
+    it('only returns user 1s username, name, description and phone#', () =>{
+      return supertest(app)
+      .get('/api/user/1')
+      .expect(200)
+      .expect(res =>{
+        expect(res.body).to.have.keys('username', 'name', 'description', 'phone');
+        expect(res.body).to.have.property('username', testUsers[0].username);
+        expect(res.body).to.have.property('name', testUsers[0].name);
+        expect(res.body).to.have.property('description', testUsers[0].description);
+        expect(res.body).to.have.property('phone', testUsers[0].phone);
+
       })
     })
   })
