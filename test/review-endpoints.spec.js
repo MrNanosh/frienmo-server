@@ -20,7 +20,11 @@ describe.only('reviews Endpoints', function() {
 
   before('cleanup', () => helpers.cleanTables(db))
 
-  afterEach('cleanup', () => helpers.cleanTables(db))
+  afterEach('cleanup', async () => { 
+      await helpers.cleanTables(db)
+      console.log(await db('user').select('*'))
+    })
+
 
   describe(`POST /api/review`, () => {
     beforeEach('insert review', () =>
@@ -32,50 +36,54 @@ describe.only('reviews Endpoints', function() {
     )
 
     it(`creates a review, responding with 201 and the new review`, function() {
-        const testReview = testReviews[0]
         const testUser = testUsers
-        console.log(testUser)
         const newreview = {
-            id: 3,
             comment: 'Test new review',
-            reviewer: testUser[1].id,
-            reviewee: 3,
+            reviewee: testUser[0].id,
+            
         }
-        console.log(newreview)
         return supertest(app)
           .post('/api/review')
-          .set('Authorization', helpers.makeAuthHeader(testUsers))
+          .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
           .send(newreview)
           .expect(201)
           .expect(res => {
-             console.log('response',res)
-        //     expect(res.body).to.have.property('id')
-        //     expect(res.body.comment).to.eql(newreview.comment)
-        //     // expect(res.body.reviewer).to.eql(newreview.reviewer)
-        //     // expect(res.body.reviewee).to.eql(newreview.reviewee)
-        //     // expect(res.body.id).to.eql(newreview.id)
-        //     // expect(res.body.user.id).to.eql(testUser.id)
-        //     expect(res.headers.location).to.eql(`/api/review/${res.body.id}`)
-        //   })
-        //   .expect(res =>
-        //     db
-        //       .from('review')
-        //       .select('*')
-        //       .where({ id: res.body.id })
-        //       .first()
-        //       .then(row => {
-        //         expect(row.comment).to.eql(newreview.comment)
-        //         expect(row.id).to.eql(newreview.id)
-        //         expect(row.use.id).to.eql(testUser.id)
+            expect(res.body.comment).to.eql(newreview.comment)
+            expect(res.body.reviewee).to.eql(newreview.reviewee)
+            expect(res.headers.location).to.eql(`/api/review/${res.body.id}`)
+          })
+          .expect(res =>
+            db
+              .from('review')
+              .select('*')
+              .where({ id: res.body.id })
+              .first()
+              .then(row => {
+                expect(row.comment).to.eql(newreview.comment)
              })
-        //   )
+          )
       })
 
-
+    })
+////////////////////////////////////////////////////////////////////
+    describe(`GET /api/review/:id`, () => {
+        // beforeEach(() =>
+        //   helpers.seedReviewsTables( db,testUsers,testReviews,)
+        // )
+        console.log(testReviews)
+    
+        it(`gets a review, responding with 200 and get a review by id`, function() {
+            const reviewId = 3
+            return supertest(app)
+              .get(`/api/review/${reviewId}`)
+              .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
+              .expect(200)
+              
+          })
+    
+        })
 
 
 })
 
 
-
-})

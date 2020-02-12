@@ -9,8 +9,8 @@ const jsonBodyParser = express.json()
 reviewsRouter
     .route('/')
     .post(requireAuth, jsonBodyParser, (req,res,next) => {
-        const { id, comment, reviewer, reviewee } = req.body
-        const newReview = { id, comment, reviewer, reviewee}
+        const { comment,  reviewee } = req.body
+        const newReview = {  comment, reviewee}
 
         for (const [key, value] of Object.entries(newReview))
       if (value == null)
@@ -18,7 +18,8 @@ reviewsRouter
           error: `Missing '${key}' in request body`
         })
 
-        newReview.id = req.user.id
+        newReview.reviewer = req.user.id
+        console.log("newReview", newReview)
 
         ReviewsService.insertReview(
             req.app.get('db'),
@@ -32,6 +33,24 @@ reviewsRouter
             })
             .catch(next)
         
+reviewsRouter
+  .route('/:id')
+  .get((req,res,) => {
+      res.json(ReviewsService.serializeReview(res.review))
+  })
+
+reviewsRouter
+  .route('/user/:user_id')
+  .get((req,res,next) => {
+    ReviewsService.getReviewForUser(
+        req.app.get('db'),
+        req.params.user_id
+    )
+    .then(reviews => {
+        res.json(ReviewsService.serializeReviews(reviews))
+    })
+    .catch(next)
+  })
 
     })
 

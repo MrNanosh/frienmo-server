@@ -22,13 +22,11 @@ function makeKnexInstance() {
 function makeReviewsArray(users){
   return [
     {
-      id: 1,
       comment: "bad comment",
       reviewer: users[0].id,
       reviewee: users[1].id,
     },
     {
-      id: 2,
       comment: "good comment",
       reviewer: users[1].id,
       reviewee: users[0].id,
@@ -256,12 +254,8 @@ function seedReviewsTables(db, users, reviews=[]) {
   // use a transaction to group the queries and auto rollback on any failure
   return db.transaction(async trx => {
     await seedUsers(trx, users)
+    console.log("review:",await trx.from('review').select('*'))
     await trx.into('review').insert(reviews)
-    // update the auto sequence to match the forced id values
-    await trx.raw(
-      `SELECT setval('review_id_seq', ?)`,
-      [reviews[reviews.length - 1].id],
-    )
   })
 }
 
@@ -271,7 +265,14 @@ function makeReviewsFixtures() {
   return { testUsers, testReviews }
 }
 
+function makeExpectedReview(users, reviewId, reviews) {
+  console.log("reviews",reviews)
+  const expectedreviews = reviews.filter(review => review.reviewee === reviewId)
+  return expectedreviews
+}
+
 module.exports = {
+  makeExpectedReview,
   makeReviewsFixtures,
   seedReviewsTables,
   makeReviewsArray,

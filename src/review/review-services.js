@@ -21,12 +21,13 @@ const ReviewsService = {
             .into('review')
             .returning('*')
             .then(([review]) => review)
-            .then(review => 
-                ReviewsService.getById(db,review.id)
-                )
+            // .then(review => 
+            //     ReviewsService.getById(db,review.id)
+            //     )
     },
     
     serializeReview(review) {
+        console.log("serializeReview",review)
         return {
           id: review.id,
           comment: xss(review.comment),
@@ -35,6 +36,10 @@ const ReviewsService = {
 
         }
       },
+    
+    serializeReviews(reviews){
+        return reviews.map(this.serializeReview)
+    }
 
 }
 
