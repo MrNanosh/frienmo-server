@@ -34,6 +34,13 @@ function makeUsersArray() {
       password: 'password',
       phone: '1234567890'
     },
+    {
+      id: 3,
+      username: 'test-user-3',
+      name: 'Test user 3',
+      password: 'password',
+      phone: '1234567890'
+    },
   ]
 }
 
@@ -64,8 +71,8 @@ function makeUsersAndFavors() {
        },
        {
         id: 3,
-        favor_id: 3,
-        users_id: 3,
+        favor_id: 2,
+        users_id: 1,
         reciever_id: 2,
         reciever_redeemed: false,
         giver_redeemed: false,
@@ -84,11 +91,11 @@ function makeUsersAndFavors() {
     },
     {
       user_id: 1,
-      friend_id: 2,
+      friend_id: 3,
       accepted: true
     },
     {
-      user_id: 2,
+      user_id: 3,
       friend_id: 1,
       accepted: false
     },
@@ -113,14 +120,14 @@ function makeUsersAndFavors() {
       title: 'title 1',
       description: 'description 1',
       creator_id: 1,
-      expiration_date: 2,
+    //  expiration_date: 2,
     },
     {
       id: 2,
       title: 'title 2',
       description: 'description 2',
       creator_id: 2,
-      expiration_date: '',
+    //  expiration_date: '',
     },
    
   ]
@@ -209,20 +216,23 @@ async function seedUsersFavor(db, users, favor, outstanding, review, friend) {
   await seedUsers(db, users)
 
   await db.transaction(async trx => {
+//    console.log(favor, outstanding, review);
     await trx.into('favor').insert(favor)
+ //   console.log(1);
     await trx.into('outstanding').insert(outstanding)
+  //  console.log(1);
     await trx.into('review').insert(review)
     await trx.into('friend').insert(friend)
-
+  //  console.log(1);
 
     const favorDescrip = favor.find(
       fav => fav.creator_id === favor[0].id
     )
-
+    console.log('in')
     await Promise.all([
       trx.raw(
         `SELECT setval('user_id_seq', ?)`,
-        [user[user.length - 1].id],
+        [users[users.length - 1].id],
       ),
       trx.raw(
         `SELECT setval('favor_id_seq', ?)`,
@@ -238,6 +248,7 @@ async function seedUsersFavor(db, users, favor, outstanding, review, friend) {
       ),
     ])
   })
+  console.log('done')
 }
 
 module.exports = {
