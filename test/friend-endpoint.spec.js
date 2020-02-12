@@ -63,10 +63,10 @@ describe.only('Auth Endpoints', function () {
             )
         )
         it('makes a new friend request with one accepted and the other unaccepted', () => {
-            const friendToFriend ={
+            const friendToFriend = {
                 friend_id: 3
             }
-            const friendReturn ={
+            const friendReturn = {
                 user_id: 2,
                 friend_id: 3,
                 accepted: true
@@ -77,19 +77,19 @@ describe.only('Auth Endpoints', function () {
                 .send(friendToFriend)
                 .expect(201)
                 .expect(friendReturn)
-                .expect(res =>{
+                .expect(res => {
                     db.select('*').from('friend').where('user_id', 3)
-                    .then(result =>{
-                        expect(result[1]).to.have.keys('user_id', 'friend_id', 'accepted')
-                        expect(result[1]).to.have.property('user_id', 3)
-                        expect(result[1]).to.have.property('friend_id', 2)
-                        expect(result[1]).to.have.property('accepted', false)
-                    })
+                        .then(result => {
+                            expect(result[1]).to.have.keys('user_id', 'friend_id', 'accepted')
+                            expect(result[1]).to.have.property('user_id', 3)
+                            expect(result[1]).to.have.property('friend_id', 2)
+                            expect(result[1]).to.have.property('accepted', false)
+                        })
                 })
         })
     })
 
-    describe('PATCH /api/friend', () => {
+    describe('PATCH /api/friend/:id', () => {
         beforeEach('insert users, favors, friends, etc', () =>
             helpers.seedUsersFavor(
                 db,
@@ -100,25 +100,53 @@ describe.only('Auth Endpoints', function () {
                 friend
             )
         )
-        it('it updates the accepted property to true', () =>{
-            const friendToConfirm ={
+        it('it updates the accepted property to true', () => {
+            const friendToConfirm = {
                 friend_id: 1
             }
             return supertest(app)
-            .patch('/api/friend')
-            .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
-            .send(friendToConfirm)
-            .expect(201)
-            .expect(res =>{
-                expect(res.body).to.have.keys('user_id', 'friend_id', 'accepted')
-                expect(res.body).to.have.property('user_id', 3)
-                expect(res.body).to.have.property('friend_id', 1)
-                expect(res.body).to.have.property('accepted', true)
-            })
+                .patch('/api/friend/1')
+                .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+                .expect(201)
+                .expect(res => {
+                    expect(res.body).to.have.keys('user_id', 'friend_id', 'accepted')
+                    expect(res.body).to.have.property('user_id', 3)
+                    expect(res.body).to.have.property('friend_id', 1)
+                    expect(res.body).to.have.property('accepted', true)
+                })
         })
     })
 
-    describe('DELETE /api/friend', () => {
-        
+    describe('DELETE /api/friend/:id', () => {
+        beforeEach('insert users, favors, friends, etc', () =>
+            helpers.seedUsersFavor(
+                db,
+                testUsers,
+                favor,
+                outstanding,
+                review,
+                friend
+            )
+        )
+        it('it deletes the friendship', () => {
+            return supertest(app)
+                .delete('/api/friend/1')
+                .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+                .expect(201)
+                .expect(() => {
+                    return db.select('*').from('friend')
+                        .then(res => {
+                            expect(res).to.have.length(2)
+                            expect(res[0]).to.have.keys('user_id', 'friend_id', 'accepted')
+                            expect(res[0]).to.have.property('user_id', 1)
+                            expect(res[0]).to.have.property('friend_id', 2)
+                            expect(res[0]).to.have.property('accepted', true)
+                            expect(res[1]).to.have.keys('user_id', 'friend_id', 'accepted')
+                            expect(res[1]).to.have.property('user_id', 2)
+                            expect(res[1]).to.have.property('friend_id', 1)
+                            expect(res[1]).to.have.property('accepted', true)
+                        })
+                })
+        })
     })
 });
