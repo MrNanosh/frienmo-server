@@ -25,14 +25,16 @@ function makeUsersArray() {
       username: 'test-user-1',
       name: 'Test user 1',
       password: 'password',
-      phone: '1234567890'
+      phone: '1234567890',
+      description: 'bleh'
     },
     {
       id: 2,
       username: 'test-user-2',
       name: 'Test user 2',
       password: 'password',
-      phone: '1234567890'
+      phone: '1234567890',
+      description: ''
     },
     {
       id: 3,
