@@ -18,6 +18,26 @@ function makeKnexInstance() {
  * create a knex instance connected to postgres
  * @returns {array} of user objects
  */
+
+function makeReviewsArray(users){
+  return [
+    {
+      id: 1,
+      comment: "bad comment",
+      reviewer: users[0].id,
+      reviewee: users[1].id,
+    },
+    {
+      id: 2,
+      comment: "good comment",
+      reviewer: users[1].id,
+      reviewee: users[0].id,
+    },
+  ]
+}
+
+
+
 function makeUsersArray() {
   return [
     {
@@ -232,7 +252,29 @@ async function seedUsersFavor(db, users, favor, outstanding, review, friend) {
   })
 }
 
+function seedReviewsTables(db, users, reviews=[]) {
+  // use a transaction to group the queries and auto rollback on any failure
+  return db.transaction(async trx => {
+    await seedUsers(trx, users)
+    await trx.into('review').insert(reviews)
+    // update the auto sequence to match the forced id values
+    await trx.raw(
+      `SELECT setval('review_id_seq', ?)`,
+      [reviews[reviews.length - 1].id],
+    )
+  })
+}
+
+function makeReviewsFixtures() {
+  const testUsers = makeUsersArray()
+  const testReviews = makeReviewsArray(testUsers)
+  return { testUsers, testReviews }
+}
+
 module.exports = {
+  makeReviewsFixtures,
+  seedReviewsTables,
+  makeReviewsArray,
   makeKnexInstance,
   makeUsersArray,
   makeUsersAndFavors,
