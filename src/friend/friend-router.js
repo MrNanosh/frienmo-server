@@ -42,7 +42,8 @@ friendRouter
     })
     //changed accepted to true
     .patch(bodyParser, (req, res) =>{
-
+        const {friend_id} = req.body;
+        console.log(friend_id);
     })
     //deletes a friend request
     .delete(bodyParser, (req, res) =>{

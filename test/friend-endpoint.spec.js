@@ -90,7 +90,32 @@ describe.only('Auth Endpoints', function () {
     })
 
     describe('PATCH /api/friend', () => {
-
+        beforeEach('insert users, favors, friends, etc', () =>
+            helpers.seedUsersFavor(
+                db,
+                testUsers,
+                favor,
+                outstanding,
+                review,
+                friend
+            )
+        )
+        it('it updates the accepted property to true', () =>{
+            const friendToConfirm ={
+                friend_id: 1
+            }
+            return supertest(app)
+            .patch('/api/friend')
+            .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+            .send(friendToConfirm)
+            .expect(201)
+            .expect(res =>{
+                expect(res.body).to.have.keys('user_id', 'friend_id', 'accepted')
+                expect(res.body).to.have.property('user_id', 3)
+                expect(res.body).to.have.property('friend_id', 1)
+                expect(res.body).to.have.property('accepted', true)
+            })
+        })
     })
 
     describe('DELETE /api/friend', () => {
