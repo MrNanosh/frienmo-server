@@ -27,8 +27,26 @@ const FriendService = {
             });
         });
     },
+    //returns a boolean, true if the friend exists and is unaccepted, 
+    //false if it is accepted, null if the friend doesnt exist
+    getFriendRequestById(db, user_id, friend_id){
+        return db.select('*').from('friend').where({user_id})
+        .then(res =>{
+            let result = false
+            for(let i =0; i < res.length; i++){
+                if(res[i].friend_id === friend_id){
+                    if(!res[i].accepted){
+                        return result = true;
+                    }
+                }
+            }
+            return result;
+        })
+    },
     confirmFriend(db, user_id, friend_id){
-
+        return db('friend').where('user_id', user_id).andWhere('friend_id', friend_id).update({
+            accepted: true
+        }, ['user_id', 'friend_id', 'accepted']);
     },
     deleteFriend(db, user_id, friend_id){
 

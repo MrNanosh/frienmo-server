@@ -34,16 +34,22 @@ friendRouter
         }
         friendService.makeFriend(req.app.get('db'), friend1, friend2)
         .then(friend =>{
-            console.log(friend);
             res.status(201).send(friend);
         })
 
         
     })
     //changed accepted to true
-    .patch(bodyParser, (req, res) =>{
+    
+    .patch(bodyParser, async (req, res) =>{
         const {friend_id} = req.body;
-        console.log(friend_id);
+        let confirm = await friendService.getFriendRequestById(req.app.get('db'), req.user.id, friend_id);
+        if(confirm){
+            const acceptance = await friendService.confirmFriend(req.app.get('db'), req.user.id, friend_id);
+            res.status(201).send(acceptance[0]);
+        } else {
+            res.status(400).send({error: 'friend request does not exist'});
+        }
     })
     //deletes a friend request
     .delete(bodyParser, (req, res) =>{
