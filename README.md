@@ -93,27 +93,51 @@ makes a new review and returns the location of the review
 
 will return an object with the specified favor.
 
+```
+
+```
+
 #### GET api/favor/friend
 
 gets favors that were posted among your friends and not just the general public
+
+```
+
+```
 
 #### GET api/favor
 
 gets a paginated list of favors from the local community.
 Does not show
 
+```
+
+```
+
 uses queries page and limit to paginate with a default page of 1
 and a limit of 30 entries.
+
+```
+
+```
 
 #### GET api/favor/personal
 
 gets a list of favors created by the user, issued by the user, or received by the user
+
+```
+
+```
 
 #### PATCH api/favor/:id
 
 allowed: patching of certain fields under certain conditions:
 allowed: increase the expiration date of a favor that has receiver_id set
 allowed: update any field if favor_outstanding does not reference its id
+
+```
+
+```
 
 #### POST api/favor/issue
 
@@ -122,15 +146,45 @@ favor_outstanding. if a favor is not outstanding and giver and receiver id is in
 add a row for it in favor_outstanding. The limit of that favor to be issued
 will stop the patch if there is an attempt to go over. An error will be thrown in this case.
 
+```
+
+```
+
 #### PATCH api/favor/redeem/:favor_id
 
 takes favor id as a parameter
 takes outstanding_id as the request body and should redeem or confirm redeeming
 of a favor for the authorized user
 
+```
+
+```
+
 #### DELETE api/favor/:id
 
 an authorized user may delete a favor if favor_outstanding does not reference its id
+
+```
+
+```
+
+#### POST api/favor
+
+authorized post posts with the user as a creator of the favor but
+makes a null outstanding. Makes 1 outstanding favor with a value
+for the giver and receiver as null.
+
+```
+
+```
+
+#### GET api/favor/public
+
+gets the authorized route for the public
+
+```
+
+```
 
 ### api/category
 
