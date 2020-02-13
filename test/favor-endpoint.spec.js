@@ -41,51 +41,48 @@ describe.only('Favor Endpoints', function() {
   )
 );
 
+describe('/ route', () =>{
   describe('GET /api/favor', () => {
 
     it('it returns all favors marked public for all users', () => {
+
       return supertest(app)
-        .get('/api/friend')
-        .set(
-          'Authorization',
-          helpers.makeAuthHeader(
-            testUser
-          )
-        )
+        .get('/api/favor')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(200)
         .expect(res => {
-          expect(
-            res.body
-          ).to.have.length(1);
-          expect(
-            res.body[0]
-          ).to.have.keys(
-            'user_id',
-            'friend_id',
-            'accepted'
-          );
-          expect(
-            res.body[0]
-          ).to.have.property(
-            'user_id',
-            1
-          );
-          expect(
-            res.body[0]
-          ).to.have.property(
-            'friend_id',
-            2
-          );
-          expect(
-            res.body[0]
-          ).to.have.property(
-            'accepted',
-            true
-          );
+          expect(res.body).to.have.keys('favors', 'page', 'limit');
+          expect(res.body.favors).to.deep.equal([{
+            category: null,
+            creator_id: 2,
+            creator_name: 'Test user 2',
+            creator_username: 'test-user-2',
+            description: 'description 2',
+            expiration_date: null,
+            id: 2,
+            issuer_id: 2,
+            issuer_name: 'Test user 2',
+            issuer_username: 'test-user-2',
+            limit: null,
+            outstanding_id: 2,
+            posted: null,
+            publicity: 'public',
+            receiver_id: 1,
+            receiver_name: 'Test user 1',
+            receiver_username: 'test-user-1',
+            tags: null,
+            title: 'title 2',
+            user_location: null
+          }]);
+          expect(res.body).to.have.property('page', 1);
+          expect(res.body).to.have.property('limit', 30);
         });
     });
   });
+  describe('POST /api/favor', () =>{})
+})
 
+describe('/:id route', () =>{
   describe('GET /api/favor/:id', () => {
     it('returns the specified favor', () =>{
       const expectedFavor ={
@@ -106,14 +103,26 @@ describe.only('Favor Endpoints', function() {
       .expect(expectedFavor)
     })
   });
+  describe('PATCH /api/favor/:id', () =>{});
+  describe('DELETE /api/favor/:id', () =>{});
+})
 
   describe('GET /api/favor/friend', () => {
-  
+    it('gets favors that were posted by friends and only friends', () =>{
+      return supertest(app)
+      .get('/ai/favor/friend')
+      .set(
+        'Authorization',
+        helpers.makeAuthHeader(
+          testUser
+        )
+      )
+      .expect(200)
+      .expect({hello: 'hello'});
+    })
   });
 
   describe('GET /api/favor/personal', () => {});
-
-  describe('PATCH /api/favor/:id', () =>{});
 
   describe('GET /api/favor/public', () => {});
 

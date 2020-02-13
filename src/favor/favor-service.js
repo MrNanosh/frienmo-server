@@ -23,54 +23,18 @@ const FavorService = {
       limit: favor.limit
     };
   },
-  getAllFavors(
-    db,
-    productsPerPage,
-    page
-  ) {
+  async getAllFavors(db, productsPerPage, page) {
     const offset =
-      productsPerPage * (page - 1);
+      productsPerPage * (page - 1); 
     return db('outstanding as o')
-      .join(
-        'favor as fa',
-        'fa.id',
-        '=',
-        'o.favor_id'
-      )
-      .join(
-        'user as creator',
-        'creator.id',
-        '=',
-        'fa.creator_id'
-      )
-      .where(
-        'fa.publicity',
-        '=',
-        'public'
-      )
-      .join(
-        'user as receiver',
-        'receiver.id',
-        '=',
-        'o.receiver_id'
-      )
-      .join(
-        'user as issuer',
-        'issuer.id',
-        '=',
-        'o.users_id'
-      )
+      .join('favor as fa', 'fa.id', '=', 'o.favor_id')
+      .join('user as creator', 'creator.id', '=', 'fa.creator_id')
+      .where('fa.publicity', '=', 'public')
+      .join('user as receiver', 'receiver.id', '=', 'o.receiver_id')
+      .join('user as issuer', 'issuer.id', '=', 'o.users_id')
       .orderBy('posted', 'desc')
       .select(
-        'fa.id as favor_id',
-        'fa.title as title',
-        'fa.description as description',
-        'fa.category as category',
-        'fa.expiration_date as expiration_date',
-        'fa.publicity as publicity',
-        'fa.user_location as user_location',
-        'fa.tags as tags',
-        'fa.limit as limit',
+        'fa.*',
         'o.id as outstanding_id',
         'creator.id as creator_id',
         'creator.name as creator_name',
@@ -83,7 +47,7 @@ const FavorService = {
         'receiver.username as receiver_username'
       )
       .limit(productsPerPage)
-      .offset(offset);
+      .offset(offset)
   },
   getFavorById(db, id) {
     // db

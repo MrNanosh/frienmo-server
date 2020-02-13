@@ -17,7 +17,7 @@ favorRouter
     if (!page) {
       page = 1;
     }
-    const favors = await FavorService.getAllFavors(
+    let favors = await FavorService.getAllFavors(
       req.app.get('db'),
       limit,
       page
@@ -226,7 +226,7 @@ favorRouter
 
 favorRouter
   .use(requireAuth)
-  .route('/')
+  .route('/') 
   .post(
     jsonBodyParser,
     async (req, res, next) => {
@@ -284,8 +284,9 @@ favorRouter
   );
 
 favorRouter
+  .use(requireAuth)
   .route('/:id')
-  .all(async (req, res, next) => {
+  .get(async (req, res) => {
     const favor = await FavorService.getFavorById(
       req.app.get('db'),
       req.params.id
@@ -295,19 +296,8 @@ favorRouter
         error: 'favor non-existent'
       });
     }
-    next(); //added to actually get into the get call
+    return res.status(200).json(favor);
   })
-  .get(async (req, res) => {
-    const favor = await FavorService.getFavorById(
-      req.app.get('db'),
-      req.params.id
-    );
-    return res.status(201).json(favor);
-  });
-
-favorRouter
-  .use(requireAuth)
-  .route('/:id')
   .patch(
     jsonBodyParser,
     async (req, res) => {
