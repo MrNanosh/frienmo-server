@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Auth Endpoints', function() {
+describe.only('Favor Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -30,20 +30,168 @@ describe('Auth Endpoints', function() {
     helpers.cleanTables(db)
   );
 
-  describe('GET /api/favor', () => {
-    beforeEach('insert users', () =>
-      helpers.seedUsersFavor(
-        db,
-        testUsers,
-        favor,
-        outstanding,
-        review,
-        friend
-      )
-    );
-    it('it returns all favors marked public for all users', () => {
+  beforeEach('insert users', () =>
+    helpers.seedUsersFavor(
+      db,
+      testUsers,
+      favor,
+      outstanding,
+      review,
+      friend
+    )
+  );
+
+  describe('/ route', () => {
+    describe('GET /api/favor', () => {
+
+      it('it returns all favors marked public for all users', () => {
+
+        return supertest(app)
+          .get('/api/favor')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body).to.have.keys('favors', 'page', 'limit');
+            expect(res.body.favors).to.deep.equal([
+              {
+                category: null,
+                creator_id: 1,
+                creator_name: 'Test user 1',
+                creator_username: 'test-user-1',
+                description: 'description 1',
+                expiration_date: null,
+                id: 1,
+                issuer_id: 1,
+                issuer_name: 'Test user 1',
+                issuer_username: 'test-user-1',
+                limit: null,
+                outstanding_id: 1,
+                posted: null,
+                publicity: 'public',
+                receiver_id: 2,
+                receiver_name: 'Test user 2',
+                receiver_username: 'test-user-2',
+                tags: null,
+                title: 'title 1',
+                user_location: null
+              },
+              {
+                category: null,
+                creator_id: 2,
+                creator_name: 'Test user 2',
+                creator_username: 'test-user-2',
+                description: 'description 2',
+                expiration_date: null,
+                id: 2,
+                issuer_id: 2,
+                issuer_name: 'Test user 2',
+                issuer_username: 'test-user-2',
+                limit: null,
+                outstanding_id: 2,
+                posted: null,
+                publicity: 'public',
+                receiver_id: 1,
+                receiver_name: 'Test user 1',
+                receiver_username: 'test-user-1',
+                tags: null,
+                title: 'title 2',
+                user_location: null
+              }]);
+            expect(res.body).to.have.property('page', 1);
+            expect(res.body).to.have.property('limit', 30);
+          });
+      });
+    });
+    describe('POST /api/favor', () => {
+      it('it returns 201 and the right information',() => {
+        const newFavor = {
+          id: 3,
+          title: 'newFavor',
+          description: 'its news',
+          creator_id: 1,
+          expiration_date: null,
+          publicity: 'public',
+          user_location: '',
+          tags: '',
+          category: 1,
+          limit: 20,
+          posted: null
+        }
+        return supertest(app)
+          .post('/api/favor')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .send(newFavor)
+          .expect(201)
+          .expect(async () =>{
+            //maybe have formatting like this (function () { var aName = "Barry"; })();
+
+            //let favorCheck = await db.select('*').from('favor').where('id', 3).first();
+            //console.log(favorCheck);
+            let outCheck = await db.select('*').from('outstanding').where('favor_id', 3).first();
+            //console.log(outCheck);
+            //check if the database for favor is right, and outstanding is right
+          });
+      })
+    })
+  })
+
+  describe('/:id route', () => {
+    describe('GET /api/favor/:id', () => {
+      it('returns the specified favor', () => {
+        const expectedFavor = {
+            category: null,
+            creator_id: 1,
+            creator_name: 'Test user 1',
+            creator_username: 'test-user-1',
+            description: 'description 1',
+            expiration_date: null,
+            id: 1,
+            issuer_id: 1,
+            issuer_name: 'Test user 1',
+            issuer_username: 'test-user-1',
+            limit: null,
+            outstanding_id: 1,
+            posted: null,
+            publicity: 'public',
+            receiver_id: 2,
+            receiver_name: 'Test user 2',
+            receiver_username: 'test-user-2',
+            tags: null,
+            title: 'title 1',
+            user_location: null
+          }
+        return supertest(app)
+          .get('/api/favor/1')
+          .set(
+            'Authorization',
+            helpers.makeAuthHeader(
+              testUser
+            )
+          )
+          .expect(200)
+          .expect(expectedFavor)
+      })
+    });
+    describe.only('PATCH /api/favor/:id', () => {
+      it('properly updates the favor', () =>{
+        let updates = {
+          limit: 2000000001
+        }
+        return supertest(app)
+        .patch('/api/favor/1')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .send(updates)
+        .expect(201)
+        .expect(updates)
+      })
+     });
+    describe('DELETE /api/favor/:id', () => { });
+  })
+
+  describe('GET /api/favor/friend', () => {
+    it('gets favors that were posted by friends and only friends', () => {
       return supertest(app)
-        .get('/api/friend')
+        .get('/ai/favor/friend')
         .set(
           'Authorization',
           helpers.makeAuthHeader(
@@ -51,256 +199,16 @@ describe('Auth Endpoints', function() {
           )
         )
         .expect(200)
-        .expect(res => {
-          expect(
-            res.body
-          ).to.have.length(1);
-          expect(
-            res.body[0]
-          ).to.have.keys(
-            'user_id',
-            'friend_id',
-            'accepted'
-          );
-          expect(
-            res.body[0]
-          ).to.have.property(
-            'user_id',
-            1
-          );
-          expect(
-            res.body[0]
-          ).to.have.property(
-            'friend_id',
-            2
-          );
-          expect(
-            res.body[0]
-          ).to.have.property(
-            'accepted',
-            true
-          );
-        });
-    });
+        .expect({ hello: 'hello' });
+    })
   });
 
-  describe('POST /api/friend', () => {
-    beforeEach(
-      'insert users, favors, friends, etc',
-      () =>
-        helpers.seedUsersFavor(
-          db,
-          testUsers,
-          favor,
-          outstanding,
-          review,
-          friend
-        )
-    );
-    it('makes a new friend request with one accepted and the other unaccepted', () => {
-      const friendToFriend = {
-        friend_id: 3
-      };
-      const friendReturn = {
-        user_id: 2,
-        friend_id: 3,
-        accepted: true
-      };
-      return supertest(app)
-        .post('/api/friend')
-        .set(
-          'Authorization',
-          helpers.makeAuthHeader(
-            testUsers[1]
-          )
-        )
-        .send(friendToFriend)
-        .expect(201)
-        .expect(friendReturn)
-        .expect(res => {
-          db.select('*')
-            .from('friend')
-            .where('user_id', 3)
-            .then(result => {
-              expect(
-                result[1]
-              ).to.have.keys(
-                'user_id',
-                'friend_id',
-                'accepted'
-              );
-              expect(
-                result[1]
-              ).to.have.property(
-                'user_id',
-                3
-              );
-              expect(
-                result[1]
-              ).to.have.property(
-                'friend_id',
-                2
-              );
-              expect(
-                result[1]
-              ).to.have.property(
-                'accepted',
-                false
-              );
-            });
-        });
-    });
-  });
+  describe('GET /api/favor/personal', () => { });
 
-  describe('PATCH /api/friend/:id', () => {
-    beforeEach(
-      'insert users, favors, friends, etc',
-      () =>
-        helpers.seedUsersFavor(
-          db,
-          testUsers,
-          favor,
-          outstanding,
-          review,
-          friend
-        )
-    );
-    it('it updates the accepted property to true', () => {
-      const friendToConfirm = {
-        friend_id: 1
-      };
-      return supertest(app)
-        .patch('/api/friend/1')
-        .set(
-          'Authorization',
-          helpers.makeAuthHeader(
-            testUsers[2]
-          )
-        )
-        .expect(201)
-        .expect(res => {
-          expect(res.body).to.have.keys(
-            'user_id',
-            'friend_id',
-            'accepted'
-          );
-          expect(
-            res.body
-          ).to.have.property(
-            'user_id',
-            3
-          );
-          expect(
-            res.body
-          ).to.have.property(
-            'friend_id',
-            1
-          );
-          expect(
-            res.body
-          ).to.have.property(
-            'accepted',
-            true
-          );
-        });
-    });
-  });
+  describe('GET /api/favor/public', () => { });
 
-  describe('DELETE /api/friend/:id', () => {
-    beforeEach(
-      'insert users, favors, friends, etc',
-      () =>
-        helpers.seedUsersFavor(
-          db,
-          testUsers,
-          favor,
-          outstanding,
-          review,
-          friend
-        )
-    );
-    it('it deletes the friendship', () => {
-      return supertest(app)
-        .delete('/api/friend/1')
-        .set(
-          'Authorization',
-          helpers.makeAuthHeader(
-            testUsers[2]
-          )
-        )
-        .expect(201)
-        .expect(() => {
-          return db
-            .select('*')
-            .from('friend')
-            .then(res => {
-              expect(
-                res
-              ).to.have.length(2);
-              expect(
-                res[0]
-              ).to.have.keys(
-                'user_id',
-                'friend_id',
-                'accepted'
-              );
-              expect(
-                res[0]
-              ).to.have.property(
-                'user_id',
-                1
-              );
-              expect(
-                res[0]
-              ).to.have.property(
-                'friend_id',
-                2
-              );
-              expect(
-                res[0]
-              ).to.have.property(
-                'accepted',
-                true
-              );
-              expect(
-                res[1]
-              ).to.have.keys(
-                'user_id',
-                'friend_id',
-                'accepted'
-              );
-              expect(
-                res[1]
-              ).to.have.property(
-                'user_id',
-                2
-              );
-              expect(
-                res[1]
-              ).to.have.property(
-                'friend_id',
-                1
-              );
-              expect(
-                res[1]
-              ).to.have.property(
-                'accepted',
-                true
-              );
-            });
-        });
-    });
-  });
+  describe('POST api/favor/issue', () => { });
 
-  describe('GET /api/favor/:id', () => {});
+  describe('PATCH api/favor/redeem/:favor_id', () => { });
 
-  describe('GET /api/favor/friend', () => {});
-
-  describe('GET /api/favor/personal', () => {});
-
-  describe('GET /api/favor/public', () => {});
-
-  describe('POST api/favor/issue', () => {});
-
-  describe('PATCH api/favor/redeem/:favor_id', () => {});
 });

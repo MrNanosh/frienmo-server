@@ -54,6 +54,24 @@ function makeUsersArray() {
  * @returns {Array(languages, words)} - arrays of languages and words
  */
 function makeUsersAndFavors() {
+    const favor = [
+    {
+      id: 1,
+      title: 'title 1',
+      description: 'description 1',
+      publicity: 'public',
+      creator_id: 1
+      //  expiration_date: 2,
+    },
+    {
+      id: 2,
+      title: 'title 2',
+      description: 'description 2',
+      publicity: 'public',
+      creator_id: 2
+      //  expiration_date: '',
+    }
+  ];
   const outstanding = [
     {
       id: 1,
@@ -67,18 +85,18 @@ function makeUsersAndFavors() {
       id: 2,
       favor_id: 2,
       users_id: 2,
-      receiver_id: 2,
+      receiver_id: 1,
       receiver_redeemed: true,
       giver_redeemed: false
     },
-    {
+    /*{
       id: 3,
       favor_id: 2,
       users_id: 1,
       receiver_id: 2,
       receiver_redeemed: false,
       giver_redeemed: false
-    }
+    }*/
   ];
   const friend = [
     {
@@ -117,22 +135,7 @@ function makeUsersAndFavors() {
     }
   ];
 
-  const favor = [
-    {
-      id: 1,
-      title: 'title 1',
-      description: 'description 1',
-      creator_id: 1
-      //  expiration_date: 2,
-    },
-    {
-      id: 2,
-      title: 'title 2',
-      description: 'description 2',
-      creator_id: 2
-      //  expiration_date: '',
-    }
-  ];
+
 
   return [
     favor,
@@ -173,12 +176,12 @@ function cleanTables(db) {
     trx
       .raw(
         `TRUNCATE
+        "user",
+        "favor",
         "outstanding",
         "friend",
         "review",
-        "tagged",
-        "user",
-        "favor"
+        "tagged"      
         `
       )
       .then(() =>
