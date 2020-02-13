@@ -155,7 +155,6 @@ favorRouter
       .status(200)
       .json({ favors, page, limit });
   })
-
   .patch(
     '/redeem/:favor_id',
     jsonBodyParser,
@@ -224,6 +223,7 @@ favorRouter
       return res.status(204);
     }
   );
+
 favorRouter
   .use(requireAuth)
   .route('/')
@@ -295,6 +295,7 @@ favorRouter
         error: 'favor non-existent'
       });
     }
+    next(); //added to actually get into the get call
   })
   .get(async (req, res) => {
     const favor = await FavorService.getFavorById(

@@ -173,12 +173,12 @@ function cleanTables(db) {
     trx
       .raw(
         `TRUNCATE
+        "user",
+        "favor",
         "outstanding",
         "friend",
         "review",
-        "tagged",
-        "user",
-        "favor"
+        "tagged"      
         `
       )
       .then(() =>

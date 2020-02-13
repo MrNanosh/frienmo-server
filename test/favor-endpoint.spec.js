@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Auth Endpoints', function() {
+describe.only('Favor Endpoints', function() {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -30,17 +30,19 @@ describe('Auth Endpoints', function() {
     helpers.cleanTables(db)
   );
 
+  beforeEach('insert users', () =>
+  helpers.seedUsersFavor(
+    db,
+    testUsers,
+    favor,
+    outstanding,
+    review,
+    friend
+  )
+);
+
   describe('GET /api/favor', () => {
-    beforeEach('insert users', () =>
-      helpers.seedUsersFavor(
-        db,
-        testUsers,
-        favor,
-        outstanding,
-        review,
-        friend
-      )
-    );
+
     it('it returns all favors marked public for all users', () => {
       return supertest(app)
         .get('/api/friend')
@@ -84,19 +86,42 @@ describe('Auth Endpoints', function() {
     });
   });
 
-  describe('POST /api/friend', () => {
-    beforeEach(
-      'insert users, favors, friends, etc',
-      () =>
-        helpers.seedUsersFavor(
-          db,
-          testUsers,
-          favor,
-          outstanding,
-          review,
-          friend
+  describe('GET /api/favor/:id', () => {
+    it('returns the specified favor', () =>{
+      const expectedFavor ={
+        id: 1,
+        title: 'title 1',
+        description: 'description 1',
+        creator_id: 1
+      }
+      return supertest(app)
+      .get('/api/favor/1')
+      .set(
+        'Authorization',
+        helpers.makeAuthHeader(
+          testUser
         )
-    );
+      )
+      .expect(200)
+      .expect(expectedFavor)
+    })
+  });
+
+  describe('GET /api/favor/friend', () => {
+  
+  });
+
+  describe('GET /api/favor/personal', () => {});
+
+  describe('PATCH /api/favor/:id', () =>{});
+
+  describe('GET /api/favor/public', () => {});
+
+  describe('POST api/favor/issue', () => {});
+
+  describe('PATCH api/favor/redeem/:favor_id', () => {});
+
+  describe('POST /api/friend', () => {
     it('makes a new friend request with one accepted and the other unaccepted', () => {
       const friendToFriend = {
         friend_id: 3
@@ -153,18 +178,6 @@ describe('Auth Endpoints', function() {
   });
 
   describe('PATCH /api/friend/:id', () => {
-    beforeEach(
-      'insert users, favors, friends, etc',
-      () =>
-        helpers.seedUsersFavor(
-          db,
-          testUsers,
-          favor,
-          outstanding,
-          review,
-          friend
-        )
-    );
     it('it updates the accepted property to true', () => {
       const friendToConfirm = {
         friend_id: 1
@@ -207,18 +220,6 @@ describe('Auth Endpoints', function() {
   });
 
   describe('DELETE /api/friend/:id', () => {
-    beforeEach(
-      'insert users, favors, friends, etc',
-      () =>
-        helpers.seedUsersFavor(
-          db,
-          testUsers,
-          favor,
-          outstanding,
-          review,
-          friend
-        )
-    );
     it('it deletes the friendship', () => {
       return supertest(app)
         .delete('/api/friend/1')
@@ -291,16 +292,4 @@ describe('Auth Endpoints', function() {
         });
     });
   });
-
-  describe('GET /api/favor/:id', () => {});
-
-  describe('GET /api/favor/friend', () => {});
-
-  describe('GET /api/favor/personal', () => {});
-
-  describe('GET /api/favor/public', () => {});
-
-  describe('POST api/favor/issue', () => {});
-
-  describe('PATCH api/favor/redeem/:favor_id', () => {});
 });
