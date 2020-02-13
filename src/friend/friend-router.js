@@ -39,11 +39,22 @@ friendRouter
 
 
     })
-    //changed accepted to true
 
     friendRouter
     .use(requireAuth)
+    .route('/pending')
+    .get(async (req, res) =>{
+        friendService.getFriendRequests(req.app.get('db'), req.user.id)
+        .then(result =>{
+            res.json(result);
+        })
+    })
+    
+    
+    friendRouter
+    .use(requireAuth)
     .route('/:id')
+    //changed accepted to true
     .patch(async (req, res) => {
         let friend_id  = req.params;
         friend_id = parseInt(friend_id.id)

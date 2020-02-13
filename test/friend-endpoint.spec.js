@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
+
 describe('Auth Endpoints', function () {
+
     let db
 
     const testUsers = helpers.makeUsersArray()
@@ -37,17 +39,19 @@ describe('Auth Endpoints', function () {
             )
         )
         it('returns all accepted friends for a user', () => {
+            const OutputUser=[{
+                id: 2,
+                fav_accepted: 0,
+                fav_requested: 0,
+                username: 'test-user-2',
+                name: 'Test user 2',
+                description: null
+            }]
             return supertest(app)
                 .get('/api/friend')
                 .set('Authorization', helpers.makeAuthHeader(testUser))
                 .expect(200)
-                .expect(res => {
-                    expect(res.body).to.have.length(1);
-                    expect(res.body[0]).to.have.keys('user_id', 'friend_id', 'accepted')
-                    expect(res.body[0]).to.have.property('user_id', 1)
-                    expect(res.body[0]).to.have.property('friend_id', 2)
-                    expect(res.body[0]).to.have.property('accepted', true)
-                })
+                .expect(OutputUser)
         })
     })
 
@@ -147,6 +151,34 @@ describe('Auth Endpoints', function () {
                             expect(res[1]).to.have.property('accepted', true)
                         })
                 })
+        })
+    })
+
+    describe('GET /api/friend/pending', () =>{
+        beforeEach('insert users', () =>
+            helpers.seedUsersFavor(
+                db,
+                testUsers,
+                favor,
+                outstanding,
+                review,
+                friend
+            )
+        )
+        it('returns all friends requesting friendship', () =>{
+            const OutputUser=[{
+                id: 1,
+                fav_accepted: 0,
+                fav_requested: 0,
+                username: 'test-user-1',
+                name: 'Test user 1  ',
+                description: null
+            }]
+            return supertest(app)
+            .get('/api/friend/pending')
+            .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+            .expect(200)
+            .expect(OutputUser)
         })
     })
 });
