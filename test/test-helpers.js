@@ -197,13 +197,14 @@ function seedUsers(db, users) {
     ...user,
     password: bcrypt.hashSync(user.password, 1)
   }))
+  console.log("PREPPEDUSERS",preppedUsers)
   return db.transaction(async trx => {
     await trx.into('user').insert(preppedUsers)
 
-    await trx.raw(
-      `SELECT setval('user_id_seq', ?)`,
-      [users[users.length - 1].id],
-    )
+    // await trx.raw(
+    //   `SELECT setval('user_id_seq', ?)`,
+    //   [users[users.length - 1].id],
+    // )
   })
 }
 
@@ -259,6 +260,7 @@ function seedReviewsTables(db, users, reviews=[]) {
     await trx.into('review').insert(reviews)
   })
 }
+
 
 function makeReviewsFixtures() {
   const testUsers = makeUsersArray()

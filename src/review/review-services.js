@@ -36,18 +36,27 @@ const ReviewsService = {
 
         }
       },
+      serializeUser(user){
+          return{
+              id: user.id,
+              username: user.username,
+              name: user.name
+          }
+      },
     
     serializeReviews(reviews){
         return reviews.map(this.serializeReview)
     },
 
-    // getReviewsForUser(db,user_id){
-    //     return db
-    //     .from('user')
-    //     .select('user.id')
-    //     .where('user.id',user_id)
+    getUserId(db,user_id){
+        console.log("getUserId",user_id)
+        return db
+        .from('user')
+        .select('*')
+        .where('user.id',user_id)
+        .first()
 
-    // },
+    },
 
 }
 

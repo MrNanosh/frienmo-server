@@ -36,20 +36,27 @@ reviewsRouter
         
 reviewsRouter
   .route('/:id')
-  .get((req,res,) => {
-      res.json(ReviewsService.serializeReview(res.review))
+  .get((req,res) => {
+    ReviewsService.getById(
+        req.app.get('db'),
+        req.params.id
+    )
+    .then(d => {
+        res.json(ReviewsService.serializeReview(d.review))
+
+    })
   })
 
 reviewsRouter
   .route('/user/:user_id')
   .get((req,res,next) => {
-    ReviewsService.getReviewsForUser(
+    ReviewsService.getUserId(
         req.app.get('db'),
         req.params.user_id
     )
-    .then(reviews => {
-        console.log("routeReviews:",reviews)
-        res.json(ReviewsService.serializeReviews(reviews))
+    .then(user => {
+        console.log("user:",user)
+        res.json(ReviewsService.serializeUser(user))
     })
     .catch(next)
   })

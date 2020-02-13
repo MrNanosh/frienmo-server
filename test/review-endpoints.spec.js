@@ -78,11 +78,11 @@ describe.only('reviews Endpoints', function() {
             console.log('TESTREVIEWS',testReviews)
             
             let reviewId = testReviews[0].id
-            console.log("REVIEWID",revieweId)
+            console.log("REVIEWID",reviewId)
             return supertest(app)
               .get(`/api/review/${reviewId}`)
               .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-              .expect(500)
+              .expect(200)
               .then(res => {
                   console.log('RES',res)
               })
@@ -91,18 +91,21 @@ describe.only('reviews Endpoints', function() {
     
         })
 
-        describe.skip(`GET /api/review/user/:user_id`, () => {
+        describe(`GET /api/review/user/:user_id`, () => {
             beforeEach(() =>
               helpers.seedUsers( db,testUsers)
             )    
             
             it(`gets a user id, responding with 200 and gets user`, function() {
-                console.log("TESTUSERS",testUsers)
                 const user_id = testUsers[0].id
+                console.log("user_id",user_id)
                 return supertest(app)
                   .get(`/api/review/user/${user_id}`)
                   .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                   .expect(200)
+                  .then(res => {
+                      console.log("404",res)
+                  })
                   
               })
         
