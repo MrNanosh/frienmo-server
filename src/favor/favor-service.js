@@ -19,7 +19,7 @@ const FavorService = {
       user_location: xss(
         favor.user_location
       ),
-      tag: xss(favor.tag),
+      tags: xss(favor.tags),
       limit: favor.limit
     };
   },
@@ -30,7 +30,7 @@ const FavorService = {
   ) {
     const offset =
       productsPerPage * (page - 1);
-    return db('outstanding')
+    return db('outstanding as o')
       .join(
         'favor as fa',
         'fa.id',
@@ -39,9 +39,9 @@ const FavorService = {
       )
       .join(
         'user as creator',
-        'user.id',
+        'creator.id',
         '=',
-        'favor.creator_id'
+        'fa.creator_id'
       )
       .where(
         'fa.publicity',
@@ -49,16 +49,16 @@ const FavorService = {
         'public'
       )
       .join(
-        'users as receiver',
+        'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
       .join(
-        'users as issuer',
-        'o.user_id',
+        'user as issuer',
+        'issuer.id',
         '=',
-        'issuer.id'
+        'o.users_id'
       )
       .orderBy('posted', 'desc')
       .select(
@@ -68,8 +68,8 @@ const FavorService = {
         'fa.category as category',
         'fa.expiration_date as expiration_date',
         'fa.publicity as publicity',
-        'fa.location as location',
-        'fa.tag as tag',
+        'fa.user_location as user_location',
+        'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
         'creator.id as creator_id',
@@ -101,20 +101,20 @@ const FavorService = {
       )
       .join(
         'user as creator',
-        'user.id',
+        'creator.id',
         '=',
-        'favor.creator_id'
+        'fa.creator_id'
       )
       .where('fa.id', '=', id)
       .join(
-        'users as receiver',
+        'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
       .join(
-        'users as issuer',
-        'o.user_id',
+        'user as issuer',
+        'o.users_id',
         '=',
         'issuer.id'
       )
@@ -125,8 +125,8 @@ const FavorService = {
         'fa.category as category',
         'fa.expiration_date as expiration_date',
         'fa.publicity as publicity',
-        'fa.location as location',
-        'fa.tag as tag',
+        'fa.user_location as user_location',
+        'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
         'creator.id as creator_id',
@@ -160,14 +160,14 @@ const FavorService = {
       )
       .join(
         'user as creator',
-        'user.id',
+        'creator.id',
         '=',
-        'favor.creator_id'
+        'fa.creator_id'
       )
       .where(
         'fa.publicity',
         '=',
-        'friends'
+        'friend'
       )
       .join('friend as fr', function() {
         this.on(
@@ -192,14 +192,14 @@ const FavorService = {
         );
       })
       .join(
-        'users as receiver',
+        'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
       .join(
-        'users as issuer',
-        'o.user_id',
+        'user as issuer',
+        'o.users_id',
         '=',
         'issuer.id'
       )
@@ -210,8 +210,8 @@ const FavorService = {
         'fa.category as category',
         'fa.expiration_date as expiration_date',
         'fa.publicity as publicity',
-        'fa.location as location',
-        'fa.tag as tag',
+        'fa.user_location as user_location',
+        'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
         'creator.id as creator_id',
@@ -244,16 +244,16 @@ const FavorService = {
       )
       .join(
         'user as creator',
-        'user.id',
+        'creator.id',
         '=',
-        'favor.creator_id'
+        'fa.creator_id'
       )
       .where('fa.publicity', '=', 'dm')
       .join('friend as fr', function() {
         this.on(
-          'fr.user_id',
+          'o.users_id',
           '=',
-          'o.users_id'
+          'fr.user_id'
         ).orOn(
           'fr.friend_id',
           '=',
@@ -272,14 +272,14 @@ const FavorService = {
         );
       })
       .join(
-        'users as receiver',
+        'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
       .join(
-        'users as issuer',
-        'o.user_id',
+        'user as issuer',
+        'o.users_id',
         '=',
         'issuer.id'
       )
@@ -290,8 +290,8 @@ const FavorService = {
         'fa.category as category',
         'fa.expiration_date as expiration_date',
         'fa.publicity as publicity',
-        'fa.location as location',
-        'fa.tag as tag',
+        'fa.user_location as user_location',
+        'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
         'creator.id as creator_id',
@@ -351,7 +351,7 @@ const FavorService = {
   ) {
     const offset =
       productsPerPage * (page - 1);
-    return db('outstanding')
+    return db('outstanding as o')
       .join(
         'favor as fa',
         'fa.id',
@@ -360,9 +360,9 @@ const FavorService = {
       )
       .join(
         'user as creator',
-        'user.id',
+        'creator.id',
         '=',
-        'favor.creator_id'
+        'fa.creator_id'
       )
       .where(
         'fa.publicity',
@@ -392,14 +392,14 @@ const FavorService = {
         );
       })
       .join(
-        'users as receiver',
+        'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
       .join(
-        'users as issuer',
-        'o.user_id',
+        'user as issuer',
+        'o.users_id',
         '=',
         'issuer.id'
       )
@@ -411,8 +411,8 @@ const FavorService = {
         'fa.category as category',
         'fa.expiration_date as expiration_date',
         'fa.publicity as publicity',
-        'fa.location as location',
-        'fa.tag as tag',
+        'fa.user_location as user_location',
+        'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
         'creator.id as creator_id',
