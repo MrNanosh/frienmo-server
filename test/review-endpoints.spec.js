@@ -35,7 +35,7 @@ describe.only('reviews Endpoints', function() {
       )
     )
 
-    it.skip(`creates a review, responding with 201 and the new review`, function() {
+    it(`creates a review, responding with 201 and the new review`, function() {
         const testUser = testUsers
         const newreview = {
             comment: 'Test new review',
@@ -91,7 +91,7 @@ describe.only('reviews Endpoints', function() {
     
         })
 
-        describe(`GET /api/review/user/:user_id`, () => {
+        describe.skip(`GET /api/review/user/user/:user_id`, () => {
             beforeEach(() =>
               helpers.seedUsers( db,testUsers)
             )    
@@ -100,7 +100,7 @@ describe.only('reviews Endpoints', function() {
                 const user_id = testUsers[0].id
                 console.log("user_id",user_id)
                 return supertest(app)
-                  .get(`/api/review/user/${user_id}`)
+                  .get(`/api/review/user/user/${user_id}`)
                   .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                   .expect(200)
                   .then(res => {

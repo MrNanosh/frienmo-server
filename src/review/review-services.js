@@ -24,7 +24,7 @@ const ReviewsService = {
     serializeReview(review) {
         return {
           id: review.id,
-          review: xss(review.review),
+          comment: xss(review.comment),
           reviewer: Number(review.reviewer) || {},
           reviewee: Number(review.reviewee) || {},
 
@@ -40,12 +40,13 @@ const ReviewsService = {
     
     
 
-    getUserId(db,user_id){
+    getReviewsByUserId(db,user_id){
         return db
-        .from('user')
+        .from('review')
         .select('*')
-        .where('user.id',user_id)
-        .first()
+        .join('user', {'review.reviewee': 'user.id'})
+        .where('review.reviewee',user_id)
+        // .first()
 
     },
 

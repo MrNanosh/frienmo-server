@@ -12,9 +12,9 @@ TRUNCATE
 -- ('friend admin', 'passadmin', 'friend admin', '7341234587');
 
 INSERT INTO review (
-    reviewer, reviewee, review
+    reviewee, "comment"
 )
 VALUES
-( 1, 2, 'testy test');
+(  2, 'testy test');
 
 COMMIT;
