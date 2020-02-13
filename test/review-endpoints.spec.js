@@ -91,7 +91,7 @@ describe.only('reviews Endpoints', function() {
     
         })
 
-        describe.skip(`GET /api/review/user/user/:user_id`, () => {
+        describe(`GET /api/review/user/user/:user_id`, () => {
             beforeEach(() =>
               helpers.seedUsers( db,testUsers)
             )    
