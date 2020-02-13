@@ -1,8 +1,8 @@
 Begin;
 
 TRUNCATE
-    review
-    RESTART IDENTITY CASCADE;
+    review;
+    
 
 -- INSERT INTO user ( 
 --     username, password,name,phone
@@ -12,9 +12,9 @@ TRUNCATE
 -- ('friend admin', 'passadmin', 'friend admin', '7341234587');
 
 INSERT INTO review (
-    reviewer, "comment"
+   reviewee, reviewer, "comment"
 )
 VALUES
-(  2, 'testy test');
+(  1,2, 'testy test');
 
 COMMIT;

@@ -8,10 +8,9 @@ const jsonBodyParser = express.json()
 
 reviewRouter// when posting get auth from reviewer
     .route('/')
-    //put requireAuth back,
-    .post( jsonBodyParser, (req,res,next) => {
-        const { comment,  reviewer, reviewee} = req.body
-        const newReview = {  comment, reviewer, reviewee }
+    .post(requireAuth, jsonBodyParser, (req,res,next) => {
+        const { comment,   reviewee} = req.body
+        const newReview = {  comment,  reviewee }
 
         for (const [key, value] of Object.entries(newReview))
       if (value == null){
@@ -22,7 +21,7 @@ reviewRouter// when posting get auth from reviewer
         })
       }
 
-        //newReview.reviewer = req.user.id
+        newReview.reviewer = req.user.id
         console.log("newReview", newReview)
 
         ReviewsService.insertReview(
@@ -55,7 +54,7 @@ reviewRouter
       })
       .catch(next)
   })
-  .delete((req,res,next) => {
+  .delete(requireAuth,(req,res,next) => {
     ReviewsService.deleteReview(
       req.app.get('db'),
       req.params.review_id
@@ -65,7 +64,7 @@ reviewRouter
     })
     .catch(next)
   })
-  .patch(jsonBodyParser, (req,res,next) => {
+  .patch(requireAuth, jsonBodyParser, (req,res,next) => {
   
     const { comment } = req.body
     const updateReview = { comment }
