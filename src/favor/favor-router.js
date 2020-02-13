@@ -2,131 +2,310 @@ const express = require('express');
 const path = require('path');
 const FavorService = require('./favor-service');
 
-const userRouter = express.Router();
+const favorRouter = express.Router();
 const jsonBodyParser = express.json();
 
-userRouter
+favorRouter
   .route('/')
   .post(
     jsonBodyParser,
     async (req, res, next) => {
-      let {title, description,receiver_id,} = req.body;
+      let {
+        title,
+        description,
+        tags,
+        category,
+        expiration_date,
+        publicity,
+        user_location,
+        limit
+      } = req.body;
 
-      for (const field of [])
+      for (const field of [
+        'title',
+        'description'
+      ]) {
         if (!req.body[field])
           return res.status(400).json({
             error: `Missing '${field}' in request body`
           });
+      }
 
       try {
-        const passwordError = UserService.validatePassword();
-
-        if (passwordError)
-          return res.status(400).json({
-            error: passwordError
-          });
-
-        const hasUserWithUserName = await UserService.hasUserWithUserName(
-          req.app.get('db'),
-          username
-        );
-
-        if (hasUserWithUserName)
-          return res.status(400).json({
-            error: `Username already taken`
-          });
-
-        const hashedPassword = await UserService.hashPassword(
-          password
-        );
-
-        const newUser = {
-          username,
-          password: hashedPassword,
-          name,
-          phone,
-          description
-        };
-
-        const user = await UserService.insertUser(
-          req.app.get('db'),
-          newUser
-        );
-
-        res
-          .status(201)
-          .location(
-            path.posix.join(
-              req.originalUrl,
-              `/${user.id}`
-            )
-          )
-          .json(
-            UserService.serializeUser(
-              user
-            )
-          );
+        let posted = new Date();
+        if (!req.user.id) {
+          throw new Error('protected');
+        }
+        let creator_id = req.user.id;
+        //TODO: validate tags
+        //TODO: handle tags
+        if (!tags) {
+          tags = '';
+        }
+        if (!category) {
+          category = 'misc';
+        }
+        if (!expiration_date) {
+          expiration_date = null;
+        }
+        if (!publicity) {
+          publicity = 'dm';
+        }
+        if (!user_location) {
+          user_location = '';
+        }
+        if (!limit) {
+          limit = 2000000000;
+        }
       } catch (error) {
         next(error);
       }
     }
   )
-  .get('/', (req, res) => {
-    UserService.getAllUsers(
-      req.app.get('db')
-    ).then(result => {
-      res.json(result);
-    });
+  .get(async (req, res) => {
+    let { limit, page } = req.query;
+    if (!limit) {
+      limit = 30;
+    }
+    if (!page) {
+      page = 1;
+    }
+    FavorService.getAllFavors(
+      req.app.get('db'),
+      limit,
+      page
+    );
   });
 
-userRouter
+favorRouter
   .route('/:id')
-  .get((req, res) => {
-    const { id } = req.params;
-    UserService.getUserById(
+  .all(async (req, res, next) => {
+    const favor = await FavorService.getFavorById(
       req.app.get('db'),
-      id
-    ).then(result => {
-      if (!result) {
-        res.status(404).send({
-          error: 'user not found'
-        });
-      }
-      res.json(result);
-    });
+      req.params.id
+    );
+    if (!favor) {
+      return res.status(401).json({
+        error: 'favor non-existent'
+      });
+    }
   })
-  .patch(async (req, res) => {});
-  .delete(async (req, res) => {});
-  
+  .get(async (req, res) => {
+    const favor = await FavorService.getFavorById(
+      req.app.get('db'),
+      req.params.id
+    );
+    return res.status(201).json(favor);
+  })
+  .patch(
+    jsonBodyParser,
+    async (req, res) => {
+      const db = req.app.get('db');
+      // allowed: update any field if favor_outstanding does not reference its id
+      const outstanding = await FavorService.getOutstanding(
+        db,
+        req.params.id
+      );
 
-userRouter
-  .get('/personal', (req, res) => {
-    const { id } = req.params;
-    UserService.getUserById(
-      req.app.get('db'),
-      id
-    ).then(result => {
-      if (!result) {
-        res.status(404).send({
-          error: 'user not found'
+      let {
+        expiration_date,
+        tags,
+        category,
+        user_location,
+        limit
+      } = req.body;
+
+      let newFields;
+
+      if (outstanding.length === 0) {
+        let {
+          title,
+          description,
+          publicity
+        } = req.body;
+        newFields = {
+          title,
+          description
+        };
+      }
+      const currentFavor = await FavorService.getFavorById(
+        db,
+        req.params.id
+      );
+      //dates must be larger
+      if (
+        new Date(
+          expiration_date
+        ).toLocaleString() >=
+        new Date(
+          currentFavor.expiration_date
+        ).toLocaleString()
+      ) {
+        newFields.expiration_date = expiration_date;
+      } else {
+        return res.status(400).json({
+          error:
+            'can only increase date'
         });
       }
-      res.json(result);
-    });
-  })
-  .get('/friend', (req, res) => {
-    const { id } = req.params;
-    UserService.getUserById(
-      req.app.get('db'),
-      id
-    ).then(result => {
-      if (!result) {
-        res.status(404).send({
-          error: 'user not found'
-        });
+
+      if (limit) {
+        if (
+          limit < outstanding.length
+        ) {
+          return res.status(400).json({
+            error:
+              'can not decrease limit below outstanding favors'
+          });
+        }
       }
-      res.json(result);
-    });
+
+      newFields = {
+        ...newFields,
+        expiration_date,
+        tags,
+        category,
+        publicity,
+        user_location,
+        limit,
+        title,
+        description
+      };
+      const updatedFavor = await FavorService.updateFavor(
+        db,
+        req.params.id,
+        newFields
+      );
+
+      return res
+        .status(200)
+        .json(updatedFavor);
+    }
+  )
+  .delete(async (req, res) => {
+    await FavorService.deleteFavor(
+      req.app.get('db'),
+      req.params.id
+    );
+    return res.status(204).end();
   });
+
+favorRouter
+  .get(
+    '/personal',
+    async (req, res) => {}
+  )
+  .get(
+    '/friend',
+    async (req, res) => {}
+  )
+  .post(
+    '/issue',
+    jsonBodyParser,
+    async (req, res) => {
+      let {
+        favor_id,
+        users_id,
+        receiver_id
+      } = req.body;
+      let db = req.app.get('db');
+      let outstanding = await FavorService.getOutstanding(
+        db,
+        favor_id
+      );
+      let favor = await FavorService.getFavorById(
+        db,
+        favor_id
+      );
+      if (
+        outstanding.length < favor.limit
+      ) {
+        //allow issuing of favor
+        return await FavorService.insertOutstanding(
+          db,
+          {
+            favor_id,
+            users_id,
+            receiver_id,
+            receiver_redeemed: false,
+            giver_redeemed: false
+          }
+        );
+      } else {
+        return res.status(403).json({
+          error:
+            'cannot issue any more of these favors without increasing limit'
+        });
+      }
+    }
+  )
+  .patch(
+    '/redeem/:favor_id',
+    jsonBodyParser,
+    async (req, res) => {
+      //gets specific ticket
+      const db = req.app.get('db');
+      let { outstanding_id } = req.body;
+
+      let confirmation;
+
+      //favor must exist
+      let ticket = await FavorService.getOutstanding(
+        db,
+        req.params.favor_id
+      )[0];
+      if (!ticket) {
+        return res.status(404).json({
+          error: 'favor must exist'
+        });
+      }
+      //must be not redeemed by the user
+      if (!req.user) {
+        return res.status(401).json({
+          error:
+            'you must be logged in to redeem a favor'
+        });
+      } else {
+        let person = req.user.id;
+      }
+
+      let redeemedTicket;
+      if (
+        ticket.giver_redeemed === true
+      ) {
+        res.status(403).json({
+          error:
+            'this favor has already been redeemed'
+        });
+      }
+
+      if (ticket.users_id === person) {
+        if (
+          ticket.receiver_redeemed ===
+          false
+        ) {
+          return res.status(403).json({
+            error:
+              'this user may not yet confirm the favor'
+          });
+        }
+        redeemedTicket = await FavorService.redeem(
+          db,
+          outstanding_id,
+          { giver_redeemed: true }
+        );
+      }
+      if (
+        ticket.receiver_id === person
+      ) {
+        redeemedTicket = await FavorService.redeem(
+          db,
+          outstanding_id,
+          { receiver_redeemed: true }
+        );
+      }
+      return res.status(204);
+    }
+  );
 
 module.exports = favorRouter;

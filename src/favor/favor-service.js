@@ -82,10 +82,59 @@ const FavorService = {
       .offset(offset);
   },
   getFavorById(db, id) {
-    return db
-      .select('*')
-      .from('favor')
-      .where('id', id)
+    // db
+    //   .select('*')
+    //   .from('favor')
+    //   .where('id', id)
+    //   .first(); //excludes personal
+
+    return db('outstanding as o')
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'user.id',
+        '=',
+        'favor.creator_id'
+      )
+      .where('fa.id', '=', id)
+      .join(
+        'users as receiver',
+        'receiver.id',
+        '=',
+        'o.receiver_id'
+      )
+      .join(
+        'users as issuer',
+        'o.user_id',
+        '=',
+        'issuer.id'
+      )
+      .select(
+        'fa.id as favor_id',
+        'fa.title as title',
+        'fa.description as description',
+        'fa.category as category',
+        'fa.expiration_date as expiration_date',
+        'fa.publicity as publicity',
+        'fa.location as location',
+        'fa.tag as tag',
+        'fa.limit as limit',
+        'o.id as outstanding_id',
+        'creator.id as creator_id',
+        'creator.name as creator_name',
+        'creator.username as creator_username',
+        'issuer.id as issuer_id',
+        'issuer.name as issuer_name',
+        'issuer.username as issuer_username',
+        'receiver.id as receiver_id',
+        'receiver.name as receiver_name',
+        'receiver.username as receiver_username'
+      )
       .first();
   },
   getFavorByFriends(db, user_id) {
@@ -180,28 +229,6 @@ const FavorService = {
         'favor.creator_id'
       )
       .where('fa.publicity', '=', 'dm')
-      .join('friend as fr', function() {
-        this.on(
-          'fr.user_id',
-          '=',
-          'o.users_id'
-        ).orOn(
-          'fr.friend_id',
-          '=',
-          'o.receiver_id'
-        );
-      })
-      .where(function() {
-        this.where(
-          'fr.user_id',
-          '=',
-          user_id
-        ).orWhere(
-          'fr.friend_id',
-          '=',
-          user_id
-        );
-      })
       .join(
         'users as receiver',
         'receiver.id',
@@ -237,14 +264,40 @@ const FavorService = {
       );
   },
   updateFavor(db, id, newFavorFields) {
-    db('favor')
+    return db('favor')
       .where({ id })
       .update(newFavorFields);
   },
   deleteFavor(db, id) {
-    db('favor')
+    return db('favor')
       .where({ id })
       .delete();
+  },
+  getOutstanding(db, favor_id) {
+    return db('outstanding')
+      .where({
+        favor_id
+      })
+      .select('*');
+  },
+  redeem(
+    db,
+    outstanding_id,
+    confirmation
+  ) {
+    return db('outstanding')
+      .where({ outstanding_id })
+      .update(confirmation);
+  },
+  insertOutstanding(
+    db,
+    newOutstanding
+  ) {
+    return db
+      .insert(newOutstanding)
+      .into('outstanding')
+      .returning('*')
+      .first();
   }
 };
 
