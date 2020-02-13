@@ -89,6 +89,9 @@ reviewRouter
         req.params.user_id
     )
     .then(user => {
+      if(!user){
+        res.status(404).send({error: 'user not found'})
+      }
         res.json(user)
     })
     .catch(next)

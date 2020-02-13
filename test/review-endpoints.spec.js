@@ -66,7 +66,7 @@ describe.only('reviews Endpoints', function() {
 
     })
 ////////////////////////////////////////////////////////////////////
-    describe.skip(`GET /api/review/:id`, () => {
+    describe(`GET /api/review/:id`, () => {
         beforeEach('insert Reviews', () =>
         helpers.seedReviewsTables(
           db,
@@ -102,7 +102,7 @@ describe.only('reviews Endpoints', function() {
                 return supertest(app)
                   .get(`/api/review/user/${user_id}`)
                   .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-                  .expect(404)
+                  .expect(200)
                   .then(res => {
                       console.log("404",res)
                   })
