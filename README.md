@@ -102,6 +102,9 @@ gets favors that were posted among your friends and not just the general public
 gets a paginated list of favors from the local community.
 Does not show
 
+uses queries page and limit to paginate with a default page of 1
+and a limit of 30 entries.
+
 #### GET api/favor/personal
 
 gets a list of favors created by the user, issued by the user, or received by the user

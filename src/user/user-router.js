@@ -11,41 +11,29 @@ userRouter
     jsonBodyParser,
     async (req, res, next) => {
       let {
-        creator_id,
-        title,
-        category,
-        publicity,
-        description,
-        user_location,
-        tag,
-        limit
+        password,
+        username,
+        name,
+        phone,
+        description
       } = req.body;
 
       for (const field of [
-        'title',
-        'description',
-        'publicity'
+        'name',
+        'username',
+        'password'
       ])
         if (!req.body[field])
           return res.status(400).json({
             error: `Missing '${field}' in request body`
           });
 
-      if (!limit) {
-        limit = 2000000000;
+      if (!description) {
+        description = '';
       }
-      //TODO: should validate the category
-      if (!category) {
-        category = 'misc';
+      if (!phone) {
+        phone = '';
       }
-      if (!user_location) {
-        location = null;
-      }
-      if (!tag) {
-        tag = null;
-      }
-      const creator_id = req.user.id;
-
       try {
         const passwordError = UserService.validatePassword(
           password
@@ -103,7 +91,6 @@ userRouter
   )
   //returns all users: username, name
   .get('/', (req, res) => {
-    //TODO: requires pagination
     UserService.getAllUsers(
       req.app.get('db')
     ).then(result => {
