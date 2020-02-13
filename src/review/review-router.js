@@ -26,6 +26,7 @@ reviewsRouter
             newReview
           )
             .then(review => {
+                console.log('REVIEW',review)
               res
                 .status(201)
                 .location(path.posix.join(req.originalUrl, `/${review.id}`))
@@ -42,11 +43,12 @@ reviewsRouter
 reviewsRouter
   .route('/user/:user_id')
   .get((req,res,next) => {
-    ReviewsService.getReviewForUser(
+    ReviewsService.getReviewsForUser(
         req.app.get('db'),
         req.params.user_id
     )
     .then(reviews => {
+        console.log("routeReviews:",reviews)
         res.json(ReviewsService.serializeReviews(reviews))
     })
     .catch(next)

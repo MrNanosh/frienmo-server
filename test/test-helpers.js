@@ -22,11 +22,13 @@ function makeKnexInstance() {
 function makeReviewsArray(users){
   return [
     {
+      id: 2,
       comment: "bad comment",
       reviewer: users[0].id,
       reviewee: users[1].id,
     },
     {
+      id: 3,
       comment: "good comment",
       reviewer: users[1].id,
       reviewee: users[0].id,
@@ -254,7 +256,6 @@ function seedReviewsTables(db, users, reviews=[]) {
   // use a transaction to group the queries and auto rollback on any failure
   return db.transaction(async trx => {
     await seedUsers(trx, users)
-    console.log("review:",await trx.from('review').select('*'))
     await trx.into('review').insert(reviews)
   })
 }

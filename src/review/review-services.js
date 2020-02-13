@@ -3,7 +3,7 @@ const xss = require('xss')
 const ReviewsService = {
     getById(db,id){
         return db
-          .from('reviews AS rev')
+          .from('review AS rev')
           .select(
               'rev.id',
               'rev.comment',
@@ -21,9 +21,9 @@ const ReviewsService = {
             .into('review')
             .returning('*')
             .then(([review]) => review)
-            // .then(review => 
-            //     ReviewsService.getById(db,review.id)
-            //     )
+            .then(review => 
+                ReviewsService.getById(db,review.id)
+                )
     },
     
     serializeReview(review) {
@@ -39,7 +39,15 @@ const ReviewsService = {
     
     serializeReviews(reviews){
         return reviews.map(this.serializeReview)
-    }
+    },
+
+    // getReviewsForUser(db,user_id){
+    //     return db
+    //     .from('user')
+    //     .select('user.id')
+    //     .where('user.id',user_id)
+
+    // },
 
 }
 
