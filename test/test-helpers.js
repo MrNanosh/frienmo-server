@@ -73,14 +73,14 @@ function makeUsersAndFavors() {
     }
   ];
   const outstanding = [
-    /*{
+    {
       id: 1,
       favor_id: 1,
       users_id: 1,
       receiver_id: 2,
       receiver_redeemed: true,
       giver_redeemed: true
-    },*/
+    },
     {
       id: 2,
       favor_id: 2,

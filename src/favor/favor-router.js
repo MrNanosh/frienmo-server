@@ -226,7 +226,7 @@ favorRouter
 
 favorRouter
   .use(requireAuth)
-  .route('/') 
+  .route('/')
   .post(
     jsonBodyParser,
     async (req, res, next) => {
@@ -263,7 +263,7 @@ favorRouter
           tags = '';
         }
         if (!category) {
-          category = 'misc';
+          category = 1;
         }
         if (!expiration_date) {
           expiration_date = null;
@@ -277,6 +277,30 @@ favorRouter
         if (!limit) {
           limit = 2000000000;
         }
+
+        let newFavor = {
+          title: title,
+          description: description,
+          creator_id: req.user.id,
+          tags: tags,
+          category: category,
+          expiration_date: expiration_date,
+          publicity: publicity,
+          user_location: user_location,
+          limit: limit,
+          posted: null
+        }
+
+        let favorRes = await FavorService.insertFavor(req.app.get('db'), newFavor);
+        let newOutstanding = {
+          favor_id: favorRes[0].id,
+          users_id: favorRes[0].creator_id,
+          receiver_id: null,
+          receiver_redeemed: false,
+          giver_redeemed: false
+        }
+        let outRes = await FavorService.insertOutstanding(req.app.get('db'), newOutstanding);
+        res.status(201).send();
       } catch (error) {
         next(error);
       }
@@ -303,46 +327,23 @@ favorRouter
     async (req, res) => {
       const db = req.app.get('db');
       // allowed: update any field if favor_outstanding does not reference its id
-      const outstanding = await FavorService.getOutstanding(
-        db,
-        req.params.id
-      );
+      const outstanding = await FavorService.getOutstanding(db, req.params.id);
 
-      let {
-        expiration_date,
-        tags,
-        category,
-        user_location,
-        limit
-      } = req.body;
+      let { expiration_date, tags, category, user_location, limit } = req.body;
 
       let newFields;
 
       if (outstanding.length === 0) {
-        let {
-          title,
-          description,
-          publicity
-        } = req.body;
-        newFields = {
-          title,
-          description
-        };
+        let { title, description, publicity } = req.body;
+        newFields = { title, description };
       }
-      const currentFavor = await FavorService.getFavorById(
-        db,
-        req.params.id
-      );
+      const currentFavor = await FavorService.getFavorById(db, req.params.id);
       //dates must be larger
-      if (
-        new Date(
-          expiration_date
-        ).toLocaleString() >=
-        new Date(
-          currentFavor.expiration_date
-        ).toLocaleString()
-      ) {
-        newFields.expiration_date = expiration_date;
+      if (new Date(expiration_date).toLocaleString() >=
+        new Date(currentFavor.expiration_date).toLocaleString()) {
+        if (!!expiration_date) {
+          newFields.expiration_date = expiration_date;
+        }
       } else {
         return res.status(400).json({
           error:
@@ -366,11 +367,11 @@ favorRouter
         expiration_date,
         tags,
         category,
-        publicity,
+//        publicity,
         user_location,
         limit,
-        title,
-        description
+//        title,
+//        description
       };
       const updatedFavor = await FavorService.updateFavor(
         db,
@@ -379,7 +380,7 @@ favorRouter
       );
 
       return res
-        .status(200)
+        .status(201)
         .json(updatedFavor);
     }
   )

@@ -5,7 +5,7 @@ const FavorService = {
       .insert(newFavor)
       .into('favor')
       .returning('*')
-      .first();
+//      .first();
   },
   serializeFavor(favor) {
     return {
@@ -23,7 +23,7 @@ const FavorService = {
       limit: favor.limit
     };
   },
-  async getAllFavors(db, productsPerPage, page) {
+  getAllFavors(db, productsPerPage, page) {
     const offset =
       productsPerPage * (page - 1); 
     return db('outstanding as o')
@@ -57,41 +57,13 @@ const FavorService = {
     //   .first(); //excludes personal
 
     return db('outstanding as o')
-      .join(
-        'favor as fa',
-        'fa.id',
-        '=',
-        'o.favor_id'
-      )
-      .join(
-        'user as creator',
-        'creator.id',
-        '=',
-        'fa.creator_id'
-      )
+      .join('favor as fa', 'fa.id', '=', 'o.favor_id')
+      .join('user as creator', 'creator.id', '=', 'fa.creator_id')
       .where('fa.id', '=', id)
-      .join(
-        'user as receiver',
-        'receiver.id',
-        '=',
-        'o.receiver_id'
-      )
-      .join(
-        'user as issuer',
-        'o.users_id',
-        '=',
-        'issuer.id'
-      )
+      .join('user as receiver', 'receiver.id', '=', 'o.receiver_id')
+      .join('user as issuer', 'o.users_id','=','issuer.id')
       .select(
-        'fa.id as favor_id',
-        'fa.title as title',
-        'fa.description as description',
-        'fa.category as category',
-        'fa.expiration_date as expiration_date',
-        'fa.publicity as publicity',
-        'fa.user_location as user_location',
-        'fa.tags as tags',
-        'fa.limit as limit',
+        'fa.*',
         'o.id as outstanding_id',
         'creator.id as creator_id',
         'creator.name as creator_name',
@@ -304,8 +276,7 @@ const FavorService = {
     return db
       .insert(newOutstanding)
       .into('outstanding')
-      .returning('*')
-      .first();
+      .returning('*');
   },
   getPublicFavors(
     db,
