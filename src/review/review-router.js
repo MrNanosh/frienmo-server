@@ -6,12 +6,12 @@ const { requireAuth } = require('../middleware/jwt-auth')
 const reviewRouter = express.Router()
 const jsonBodyParser = express.json()
 
-reviewRouter
+reviewRouter// when posting get auth from reviewer
     .route('/')
     //put requireAuth back,
     .post( jsonBodyParser, (req,res,next) => {
-        const { comment,  reviewer } = req.body
-        const newReview = {  comment, reviewer}
+        const { comment,  reviewer, reviewee} = req.body
+        const newReview = {  comment, reviewer, reviewee }
 
         for (const [key, value] of Object.entries(newReview))
       if (value == null){
@@ -66,9 +66,10 @@ reviewRouter
     .catch(next)
   })
   .patch(jsonBodyParser, (req,res,next) => {
+  
     const { comment } = req.body
     const updateReview = { comment }
-
+    //if !comment, then res 400 must have comment must not be null
    ReviewsService.updateReview(
      req.app.get('db'),
      req.params.review_id,
@@ -82,6 +83,7 @@ reviewRouter
   })
    
 reviewRouter
+//user id retrieves reviewee id
   .route('/user/:user_id')
   .get((req,res,next) => {
     ReviewsService.getReviewsByUserId(

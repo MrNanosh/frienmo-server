@@ -39,14 +39,16 @@ const ReviewsService = {
       },
     
     
+        
 
     getReviewsByUserId(db,user_id){
         return db
         .from('review')
-        .select('*')
-        .join('user', {'review.reviewer': 'user.id'})
-        .where('review.reviewer',user_id)
-        // .first()
+        .join('user AS reviewer', 'reviewer.id', '=' ,'review.reviewer')
+        .join('user AS reviewee', 'reviewee.id', '=' ,'review.reviewee')
+        .where('reviewer', '=',user_id)
+        .select('review.*', 'reviewer.name AS reviewer_name', 'reviewee.name AS reviewee_name')
+        
 
     },
 
