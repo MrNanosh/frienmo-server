@@ -102,7 +102,7 @@ describe.only('reviews Endpoints', function() {
                 return supertest(app)
                   .get(`/api/review/user/${user_id}`)
                   .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-                  .expect(200)
+                  .expect(404)
                   .then(res => {
                       console.log("404",res)
                   })

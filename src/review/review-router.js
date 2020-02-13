@@ -3,22 +3,26 @@ const path = require('path')
 const ReviewsService = require('./review-services')
 const { requireAuth } = require('../middleware/jwt-auth')
 
-const reviewsRouter = express.Router()
+const reviewRouter = express.Router()
 const jsonBodyParser = express.json()
 
-reviewsRouter
+reviewRouter
     .route('/')
-    .post(requireAuth, jsonBodyParser, (req,res,next) => {
-        const { comment,  reviewee } = req.body
-        const newReview = {  comment, reviewee}
+    //put requireAuth back,
+    .post( jsonBodyParser, (req,res,next) => {
+        const { review,  reviewee } = req.body
+        const newReview = {  review, reviewee}
 
         for (const [key, value] of Object.entries(newReview))
-      if (value == null)
+      if (value == null){
+      console.log(newReview)
         return res.status(400).json({
           error: `Missing '${key}' in request body`
+        
         })
+      }
 
-        newReview.reviewer = req.user.id
+        // newReview.reviewer = req.user.id
         console.log("newReview", newReview)
 
         ReviewsService.insertReview(
@@ -33,21 +37,51 @@ reviewsRouter
                 .json(ReviewsService.serializeReview(review))
             })
             .catch(next)
+          })
         
-reviewsRouter
-  .route('/:id')
-  .get((req,res) => {
+reviewRouter
+  .route('/:review_id')
+  .get((req,res,next) => {
     ReviewsService.getById(
-        req.app.get('db'),
-        req.params.id
-    )
-    .then(d => {
-        res.json(ReviewsService.serializeReview(d.review))
+      req.app.get('db'),
+      req.params.review_id
+      )
+      .then(review => {
+        if(!review){
+          res.status(404).send({error: 'review not found'})
+        }
+        res.json(review)
 
-    })
+      })
+      .catch(next)
   })
+  .delete((req,res,next) => {
+    ReviewsService.deleteReview(
+      req.app.get('db'),
+      req.params.review_id
+    )
+    .then(numRowsAffected => {
+      res.status(204).end()
+    })
+    .catch(next)
+  })
+  .patch(jsonBodyParser, (req,res,next) => {
+    const { review } = req.body
+    const updateReview = { review }
 
-reviewsRouter
+   ReviewsService.updateReview(
+     req.app.get('db'),
+     req.params.review_id,
+     updateReview
+   )
+   .then(numRowsAffected => {
+     res.status(204).end()
+   })
+   .catch(next)
+
+  })
+   
+reviewRouter
   .route('/user/:user_id')
   .get((req,res,next) => {
     ReviewsService.getUserId(
@@ -55,13 +89,12 @@ reviewsRouter
         req.params.user_id
     )
     .then(user => {
-        console.log("user:",user)
-        res.json(ReviewsService.serializeUser(user))
+        res.json(user)
     })
     .catch(next)
   })
 
-    })
+    
 
 
-module.exports = reviewsRouter
+module.exports = reviewRouter

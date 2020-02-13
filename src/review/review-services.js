@@ -4,12 +4,7 @@ const ReviewsService = {
     getById(db,id){
         return db
           .from('review AS rev')
-          .select(
-              'rev.id',
-              'rev.comment',
-              'rev.reviewer',
-              'rev.reviewee'
-           )
+          .select('*')
           .where('rev.id',id)
           .first()
     },
@@ -27,12 +22,11 @@ const ReviewsService = {
     },
     
     serializeReview(review) {
-        console.log("serializeReview",review)
         return {
           id: review.id,
-          comment: xss(review.comment),
-          reviewer: review.reviewer || {},
-          reviewee: review.reviewee|| {},
+          review: xss(review.review),
+          reviewer: Number(review.reviewer) || {},
+          reviewee: Number(review.reviewee) || {},
 
         }
       },
@@ -44,12 +38,9 @@ const ReviewsService = {
           }
       },
     
-    serializeReviews(reviews){
-        return reviews.map(this.serializeReview)
-    },
+    
 
     getUserId(db,user_id){
-        console.log("getUserId",user_id)
         return db
         .from('user')
         .select('*')
@@ -58,6 +49,17 @@ const ReviewsService = {
 
     },
 
+    deleteReview(db,id){
+        return db('review')
+        .where({id})
+        .delete()
+    },
+
+    updateReview(db,id,newReview){
+        return db('review')
+         .where({id})
+         .update(newReview)
+    }
 }
 
 module.exports = ReviewsService
