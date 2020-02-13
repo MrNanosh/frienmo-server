@@ -12,7 +12,7 @@ TRUNCATE
 -- ('friend admin', 'passadmin', 'friend admin', '7341234587');
 
 INSERT INTO review (
-    reviewee, "comment"
+    reviewer, "comment"
 )
 VALUES
 (  2, 'testy test');

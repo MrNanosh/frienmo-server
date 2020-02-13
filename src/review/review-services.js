@@ -44,8 +44,8 @@ const ReviewsService = {
         return db
         .from('review')
         .select('*')
-        .join('user', {'review.reviewee': 'user.id'})
-        .where('review.reviewee',user_id)
+        .join('user', {'review.reviewer': 'user.id'})
+        .where('review.reviewer',user_id)
         // .first()
 
     },

@@ -9,9 +9,9 @@ const jsonBodyParser = express.json()
 reviewRouter
     .route('/')
     //put requireAuth back,
-    .post(requireAuth, jsonBodyParser, (req,res,next) => {
-        const { comment,  reviewee } = req.body
-        const newReview = {  comment, reviewee}
+    .post( jsonBodyParser, (req,res,next) => {
+        const { comment,  reviewer } = req.body
+        const newReview = {  comment, reviewer}
 
         for (const [key, value] of Object.entries(newReview))
       if (value == null){
