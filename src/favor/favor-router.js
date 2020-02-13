@@ -70,11 +70,15 @@ favorRouter
     if (!page) {
       page = 1;
     }
-    FavorService.getAllFavors(
+    const favors = await FavorService.getAllFavors(
       req.app.get('db'),
       limit,
       page
     );
+
+    return res
+      .status(200)
+      .json({ favors, page, limit });
   });
 
 favorRouter
@@ -193,12 +197,85 @@ favorRouter
 favorRouter
   .get(
     '/personal',
-    async (req, res) => {}
+    async (req, res) => {
+      let { limit, page } = req.query;
+      let user_id = req.user.id;
+      if (!user_id) {
+        return res
+          .status(404)
+          .json(
+            'must have an authorized account to use'
+          );
+      }
+      if (!limit) {
+        limit = 30;
+      }
+      if (!page) {
+        page = 1;
+      }
+      let favors = FavorService.getPersonalFavors(
+        db,
+        user_id,
+        limit,
+        page
+      );
+      return res
+        .status(200)
+        .json({ favors, page, limit });
+    }
   )
-  .get(
-    '/friend',
-    async (req, res) => {}
-  )
+  .get('/friend', async (req, res) => {
+    let { limit, page } = req.query;
+    let user_id = req.user.id;
+    if (!user_id) {
+      return res
+        .status(404)
+        .json(
+          'must have an authorized account to use'
+        );
+    }
+    if (!limit) {
+      limit = 30;
+    }
+    if (!page) {
+      page = 1;
+    }
+    let favors = FavorService.getFavorByFriends(
+      db,
+      user_id,
+      limit,
+      page
+    );
+    return res
+      .status(200)
+      .json({ favors, page, limit });
+  })
+  .get('/public', async (req, res) => {
+    let { limit, page } = req.query;
+    let user_id = req.user.id;
+    if (!user_id) {
+      return res
+        .status(404)
+        .json(
+          'must have an authorized account to use'
+        );
+    }
+    if (!limit) {
+      limit = 30;
+    }
+    if (!page) {
+      page = 1;
+    }
+    let favors = FavorService.getPublicFavors(
+      db,
+      user_id,
+      limit,
+      page
+    );
+    return res
+      .status(200)
+      .json({ favors, page, limit });
+  })
   .post(
     '/issue',
     jsonBodyParser,
