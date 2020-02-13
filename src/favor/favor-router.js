@@ -1,55 +1,25 @@
 const express = require('express');
 const path = require('path');
-const UserService = require('./user-service');
+const FavorService = require('./favor-service');
 
 const userRouter = express.Router();
 const jsonBodyParser = express.json();
 
 userRouter
+  .route('/')
   .post(
-    '/',
     jsonBodyParser,
     async (req, res, next) => {
-      let {
-        creator_id,
-        title,
-        category,
-        publicity,
-        description,
-        user_location,
-        tag,
-        limit
-      } = req.body;
+      let {title, description,receiver_id,} = req.body;
 
-      for (const field of [
-        'title',
-        'description',
-        'publicity'
-      ])
+      for (const field of [])
         if (!req.body[field])
           return res.status(400).json({
             error: `Missing '${field}' in request body`
           });
 
-      if (!limit) {
-        limit = 2000000000;
-      }
-      //TODO: should validate the category
-      if (!category) {
-        category = 'misc';
-      }
-      if (!user_location) {
-        location = null;
-      }
-      if (!tag) {
-        tag = null;
-      }
-      const creator_id = req.user.id;
-
       try {
-        const passwordError = UserService.validatePassword(
-          password
-        );
+        const passwordError = UserService.validatePassword();
 
         if (passwordError)
           return res.status(400).json({
@@ -101,17 +71,50 @@ userRouter
       }
     }
   )
-  //returns all users: username, name
   .get('/', (req, res) => {
-    //TODO: requires pagination
     UserService.getAllUsers(
       req.app.get('db')
     ).then(result => {
       res.json(result);
     });
+  });
+
+userRouter
+  .route('/:id')
+  .get((req, res) => {
+    const { id } = req.params;
+    UserService.getUserById(
+      req.app.get('db'),
+      id
+    ).then(result => {
+      if (!result) {
+        res.status(404).send({
+          error: 'user not found'
+        });
+      }
+      res.json(result);
+    });
   })
-  //return one user with id: username, name, description, phone#
-  .get('/:id', (req, res) => {
+  .patch(async (req, res) => {});
+  .delete(async (req, res) => {});
+  
+
+userRouter
+  .get('/personal', (req, res) => {
+    const { id } = req.params;
+    UserService.getUserById(
+      req.app.get('db'),
+      id
+    ).then(result => {
+      if (!result) {
+        res.status(404).send({
+          error: 'user not found'
+        });
+      }
+      res.json(result);
+    });
+  })
+  .get('/friend', (req, res) => {
     const { id } = req.params;
     UserService.getUserById(
       req.app.get('db'),
@@ -126,4 +129,4 @@ userRouter
     });
   });
 
-module.exports = userRouter;
+module.exports = favorRouter;

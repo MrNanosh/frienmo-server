@@ -10,5 +10,7 @@ CREATE TABLE "favor"(
     "user_location" TEXT,
     "tags" TEXT,
     "category" INTEGER REFERENCES "category"(id),
+    "limit" integer,
     "posted"  TIMESTAMP
 );
+
