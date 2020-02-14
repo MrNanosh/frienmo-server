@@ -68,24 +68,24 @@ function makeUsersArray() {
     },
     {
       id: 4,
-      username: 'test-user-3',
-      name: 'Test user 3',
+      username: 'test-user-4',
+      name: 'Test user 4',
       password: 'password',
       phone: '1234567890',
       description: ''
     },
     {
       id: 5,
-      username: 'test-user-3',
-      name: 'Test user 3',
+      username: 'test-user-5',
+      name: 'Test user 5',
       password: 'password',
       phone: '1234567890',
       description: ''
     },
     {
       id: 6,
-      username: 'test-user-3',
-      name: 'Test user 3',
+      username: 'test-user-6',
+      name: 'Test user 6',
       password: 'password',
       phone: '1234567890',
       description: ''
