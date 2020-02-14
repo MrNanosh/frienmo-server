@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const FavorService = require('./favor-service');
-
+const FriendService = require('../friend/friend-service');
 const {
   requireAuth
 } = require('../middleware/jwt-auth');
@@ -289,17 +289,25 @@ favorRouter
           user_location: user_location,
           limit: limit,
           posted: null
-        }
+        };
 
-        let favorRes = await FavorService.insertFavor(req.app.get('db'), newFavor);
+        let favorRes = await FavorService.insertFavor(
+          req.app.get('db'),
+          newFavor
+        );
+        //TODO: ask the team about this
         let newOutstanding = {
           favor_id: favorRes[0].id,
-          users_id: favorRes[0].creator_id,
+          users_id:
+            favorRes[0].creator_id, //might be better as null by default
           receiver_id: null,
           receiver_redeemed: false,
           giver_redeemed: false
-        } //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
-        let outRes = await FavorService.insertOutstanding(req.app.get('db'), newOutstanding);
+        }; //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
+        let outRes = await FavorService.insertOutstanding(
+          req.app.get('db'),
+          newOutstanding
+        );
         res.status(201).send();
       } catch (error) {
         next(error);
@@ -311,15 +319,95 @@ favorRouter
   .use(requireAuth)
   .route('/:id')
   .get(async (req, res) => {
+    /**should be able to get only the ones that they are allowed to get
+     *it should filter favors where the user id matches the auth user
+     *or the receiver id matches the auth user
+     *or the creator id matches the auth user
+     *or any public one
+     */
     const favor = await FavorService.getFavorById(
       req.app.get('db'),
       req.params.id
     );
+
     if (!favor) {
       return res.status(401).json({
         error: 'favor non-existent'
       });
     }
+
+    let authuser = req.user.id;
+    if (favor.publicity !== 'public') {
+      //if it returns a non public favor
+      if (
+        authuser !== favor.issuer_id ||
+        authuser !==
+          favor.receiver_id ||
+        authuser !== favor.creator_id
+      ) {
+        if (
+          favor.publicity === 'friends'
+        ) {
+          const issuerFriends = FriendService.getFriends(
+            db,
+            favor.issuer_id
+          );
+          const receiverFriends = FriendService.getFriends(
+            db,
+            favor.receiver_id
+          );
+          const creatorFriends = FriendService.getFriends(
+            db,
+            favor.creator_id
+          );
+          const hasIssuerAsFriend = (
+            await issuerFriends
+          ).reduce(
+            (acc, curr) =>
+              curr.id === authuser
+                ? true
+                : acc,
+            false
+          );
+          const hasReceiverAsFriend = (
+            await receiverFriends
+          ).reduce(
+            (acc, curr) =>
+              curr.id === authuser
+                ? true
+                : acc,
+            false
+          );
+          const hasCreatorAsFriend = (
+            await creatorFriends
+          ).reduce(
+            (acc, curr) =>
+              curr.id === authuser
+                ? true
+                : acc,
+            false
+          );
+          if (
+            !hasIssuerAsFriend ||
+            !hasReceiverAsFriend ||
+            !hasIssuerAsFriend
+          ) {
+            return res
+              .status(403)
+              .json({
+                error:
+                  'unable to use access this favor'
+              });
+          }
+        } else {
+          return res.status(403).json({
+            error:
+              'unable to use access this favor'
+          });
+        }
+      }
+    }
+
     return res.status(200).json(favor);
   })
   .patch(
@@ -327,20 +415,45 @@ favorRouter
     async (req, res) => {
       const db = req.app.get('db');
       // allowed: update any field if favor_outstanding does not reference its id
-      const outstanding = await FavorService.getOutstanding(db, req.params.id);
+      const outstanding = await FavorService.getOutstanding(
+        db,
+        req.params.id
+      );
 
-      let { expiration_date, tags, category, user_location, limit } = req.body;
+      let {
+        expiration_date,
+        tags,
+        category,
+        user_location,
+        limit
+      } = req.body;
 
       let newFields;
 
       if (outstanding.length === 0) {
-        let { title, description, publicity } = req.body;
-        newFields = { title, description };
+        let {
+          title,
+          description,
+          publicity
+        } = req.body;
+        newFields = {
+          title,
+          description
+        };
       }
-      const currentFavor = await FavorService.getFavorById(db, req.params.id);
+      const currentFavor = await FavorService.getFavorById(
+        db,
+        req.params.id
+      );
       //dates must be larger
-      if (new Date(expiration_date).toLocaleString() >=
-        new Date(currentFavor.expiration_date).toLocaleString()) {
+      if (
+        new Date(
+          expiration_date
+        ).toLocaleString() >=
+        new Date(
+          currentFavor.expiration_date
+        ).toLocaleString()
+      ) {
         if (!!expiration_date) {
           newFields.expiration_date = expiration_date;
         }
@@ -367,11 +480,11 @@ favorRouter
         expiration_date,
         tags,
         category,
-//        publicity,
+        //        publicity,
         user_location,
-        limit,
-//        title,
-//        description
+        limit
+        //        title,
+        //        description
       };
       const updatedFavor = await FavorService.updateFavor(
         db,
