@@ -208,4 +208,24 @@ describe('User Endpoints', function () {
       })
     })
   })
+
+  describe('GET /api/user/search', () =>{
+    beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
+    it.only('returns 200 and users if theyre username exists', () =>{
+      let result = []
+      for(let i =0; i < testUsers.length; i++){
+        const obj = {
+          id: testUsers[i].id,
+          name: testUsers[i].name,
+          username: testUsers[i].username
+        }
+        result.push(obj);
+      }
+      return supertest(app)
+      .get('/api/user/search')
+      .send({username: 'test-'})
+      .expect(200)
+      .expect(result);
+    })
+  })
 })
