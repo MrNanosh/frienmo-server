@@ -43,7 +43,7 @@ function makeReviewsArray(users){
 function makeUsersArray() {
   return [
     {
-      id: 2,
+      id: 1,
       username: 'test-user-1',
       name: 'Test user 1',
       password: 'password',
@@ -51,19 +51,44 @@ function makeUsersArray() {
       description: 'bleh'
     },
     {
-      id: 3,
+      id: 2,
       username: 'test-user-2',
       name: 'Test user 2',
       password: 'password',
       phone: '1234567890',
-      description: ''
+      description: ' '
     },
     {
       id: 3,
       username: 'test-user-3',
       name: 'Test user 3',
       password: 'password',
-      phone: '1234567890'
+      phone: '1234567890',
+      description: ''
+    },
+    {
+      id: 4,
+      username: 'test-user-3',
+      name: 'Test user 3',
+      password: 'password',
+      phone: '1234567890',
+      description: ''
+    },
+    {
+      id: 5,
+      username: 'test-user-3',
+      name: 'Test user 3',
+      password: 'password',
+      phone: '1234567890',
+      description: ''
+    },
+    {
+      id: 6,
+      username: 'test-user-3',
+      name: 'Test user 3',
+      password: 'password',
+      phone: '1234567890',
+      description: ''
     }
   ];
 }
@@ -81,7 +106,6 @@ function makeUsersAndFavors() {
       description: 'description 1',
       publicity: 'public',
       creator_id: 1
-      //  expiration_date: 2,
     },
     {
       id: 2,
@@ -89,7 +113,27 @@ function makeUsersAndFavors() {
       description: 'description 2',
       publicity: 'public',
       creator_id: 2
-      //  expiration_date: '',
+    },
+    {
+      id: 3,
+      title: 'title 3',
+      description: 'description 3',
+      publicity: 'public',
+      creator_id: 3
+    },
+    {
+      id: 4,
+      title: 'title 4',
+      description: 'description 4',
+      publicity: 'public',
+      creator_id: 4
+    },
+    {
+      id: 5,
+      title: 'title 5',
+      description: 'description 5',
+      publicity: 'public',
+      creator_id: 5
     }
   ];
   const outstanding = [
@@ -109,7 +153,31 @@ function makeUsersAndFavors() {
       receiver_redeemed: true,
       giver_redeemed: false
     },
-    /*{
+  /*  {
+      id: 3,
+      favor_id: 2,
+      users_id: 1,
+      receiver_id: 2,
+      receiver_redeemed: false,
+      giver_redeemed: false
+    },
+    {
+      id: 3,
+      favor_id: 2,
+      users_id: 1,
+      receiver_id: 2,
+      receiver_redeemed: false,
+      giver_redeemed: false
+    },
+    {
+      id: 3,
+      favor_id: 2,
+      users_id: 1,
+      receiver_id: 2,
+      receiver_redeemed: false,
+      giver_redeemed: false
+    },
+    {
       id: 3,
       favor_id: 2,
       users_id: 1,
@@ -164,7 +232,6 @@ function makeUsersAndFavors() {
     outstanding
   ];
 }
-
 /**
  * make a bearer token with jwt for authorization header
  * @param {object} user - contains `id`, `username`
@@ -346,7 +413,6 @@ function makeReviewsFixtures() {
 }
 
 function makeExpectedReview(users, reviewId, reviews) {
-  console.log("reviews",reviews)
   const expectedreviews = reviews.filter(review => review.reviewee === reviewId)
   return expectedreviews
 }

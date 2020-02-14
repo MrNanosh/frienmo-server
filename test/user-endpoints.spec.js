@@ -170,12 +170,12 @@ describe('User Endpoints', function () {
   describe(`GET /api/user/`, () =>{
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
 
-    it('returns all users, but only their username and name', () =>{
+    it('returns all users, but only their username and name and id', () =>{
       return supertest(app)
       .get('/api/user')
       .expect(200)
       .expect(res =>{
-        expect(res.body[0]).to.have.keys('username', 'name')
+        expect(res.body[0]).to.have.keys('username', 'name', 'id')
         testUsers.forEach((user, index) =>{
           user = res.body[index];
           expect(user).to.have.property('username', testUsers[index].username);

@@ -2,7 +2,7 @@ const knex = require('knex')
 const app = require('../src/app')
 const helpers = require('./test-helpers')
 
-describe.only('reviews Endpoints', function() {
+describe('reviews Endpoints', function() {
   let db
 
   const { testReviews, testUsers, } = helpers.makeReviewsFixtures()
@@ -22,7 +22,6 @@ describe.only('reviews Endpoints', function() {
 
   afterEach('cleanup', async () => { 
       await helpers.cleanTables(db)
-      console.log(await db('user').select('*'))
     })
 
 
@@ -75,10 +74,8 @@ describe.only('reviews Endpoints', function() {
         )
       )
         it(`gets a review, responding with 200 and get a review`, function() {
-            console.log('TESTREVIEWS',testReviews)
             
             let reviewId = testReviews[0].id
-            console.log("REVIEWID",reviewId)
             return supertest(app)
               .get(`/api/review/${reviewId}`)
               .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
@@ -92,7 +89,7 @@ describe.only('reviews Endpoints', function() {
     
         })
 
-        describe(`GET /api/review/user/user/:user_id`, () => {
+        describe(`GET /api/review/user/:user_id`, () => {
           beforeEach('insert Reviews', () =>
           helpers.seedReviewsTables(
             db,
@@ -103,13 +100,12 @@ describe.only('reviews Endpoints', function() {
             
             it(`gets a favor id with correct userid/reviewer id, responding with 200 and gets user`, function() {
                 const user_id = testUsers[0].id
-                console.log("user_id",user_id)
                 return supertest(app)
                   .get(`/api/review/user/${user_id}`)
                   .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                   .expect(200)
                   .expect(res => {
-                   expect(res.body[0].id).to.eql(user_id)
+                   expect(res.body[0].reviewer).to.eql(user_id)
                   })
               })
         
