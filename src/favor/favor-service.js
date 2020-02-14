@@ -410,6 +410,12 @@ const FavorService = {
       )
       .limit(productsPerPage)
       .offset(offset);
+  },
+  updateOutstanding(db, outstanding_id, receiver_id, users_id){
+    return db.where('outstanding_id', outstanding_id).update({
+      receiver_id: receiver_id,
+      user_id: users_id
+    })
   }
 };
 

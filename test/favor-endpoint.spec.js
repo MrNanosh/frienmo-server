@@ -233,7 +233,21 @@ describe('Favor Endpoints', function () {
 
   describe('GET /api/favor/public', () => { });
 
-  describe('POST api/favor/issue', () => { });
+  describe.only('POST api/favor/issue', () => {
+    it('updates the user and reciever id if it doesnt exist, otherwise makes a new one', () =>{
+      const updatedUsers = {
+        favor_id: 4,
+        users_id: 1,
+        receiver_id: 2
+      }
+      return supertest(app)
+      .post('/api/favor/issue')
+      .set('Authorization', helpers.makeAuthHeader(testUser))
+      .send(updatedUsers)
+      .expect(201)
+      .expect({ hello: 'hello' });
+    })
+   });
 
   describe('PATCH api/favor/redeem/:favor_id', () => { });
 
