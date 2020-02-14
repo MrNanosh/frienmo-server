@@ -31,7 +31,6 @@ favorRouter
   .use(requireAuth)
   .route('/issue')
   .post(jsonBodyParser, async (req, res) => {
-    console.log('hello');
     let {
       favor_id,
       users_id,
@@ -43,12 +42,11 @@ favorRouter
       db,
       favor_id
     );
-    console.log('hello3')
     let checked = false;
     for (let i = 0; i < outstanding.length; i++) {
       if (outstanding.receiver_id === null) {
         console.log('hello2')
-        await FavorService.updateOutstanding(req.app.get('db'), outstanding.id, reciever_id, users_id);
+        await FavorService.updateOutstanding(req.app.get('db'), outstanding.id, receiver_id, users_id);
         checked = true;
         return res.status(201).send();
       }
@@ -69,7 +67,6 @@ favorRouter
             receiver_redeemed: false,
             giver_redeemed: false
           });
-        console.log('hello1')
         return res.status(201).send();
       } else {
         return res.status(403).json({

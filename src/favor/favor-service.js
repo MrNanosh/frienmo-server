@@ -31,35 +31,11 @@ const FavorService = {
     const offset =
       productsPerPage * (page - 1);
     return db('outstanding as o')
-      .join(
-        'favor as fa',
-        'fa.id',
-        '=',
-        'o.favor_id'
-      )
-      .join(
-        'user as creator',
-        'creator.id',
-        '=',
-        'fa.creator_id'
-      )
-      .where(
-        'fa.publicity',
-        '=',
-        'public'
-      )
-      .leftOuterJoin(
-        'user as receiver',
-        'receiver.id',
-        '=',
-        'o.receiver_id'
-      )
-      .leftOuterJoin(
-        'user as issuer',
-        'issuer.id',
-        '=',
-        'o.users_id'
-      )
+      .join('favor as fa', 'fa.id', '=', 'o.favor_id')
+      .join('user as creator', 'creator.id', '=', 'fa.creator_id')
+      .where( 'fa.publicity', '=', 'public' )
+      .leftOuterJoin( 'user as receiver', 'receiver.id', '=', 'o.receiver_id' )
+      .leftOuterJoin( 'user as issuer', 'issuer.id', '=', 'o.users_id' )
       .orderBy('posted', 'desc')
       .select(
         'fa.*',
@@ -98,13 +74,13 @@ const FavorService = {
         'fa.creator_id'
       )
       .where('fa.id', '=', id)
-      .join(
+      .leftOuterJoin(
         'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
-      .join(
+      .leftOuterJoin(
         'user as issuer',
         'o.users_id',
         '=',
@@ -153,7 +129,7 @@ const FavorService = {
         '=',
         'friend'
       )
-      .join('friend as fr', function() {
+      .leftOuterJoin('friend as fr', function() {
         this.on(
           'fr.user_id',
           '=',
@@ -175,13 +151,13 @@ const FavorService = {
           user_id
         );
       })
-      .join(
+      .leftOuterJoin(
         'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
-      .join(
+      .leftOuterJoin(
         'user as issuer',
         'o.users_id',
         '=',
@@ -233,7 +209,7 @@ const FavorService = {
         'fa.creator_id'
       )
       .where('fa.publicity', '=', 'dm')
-      .join('friend as fr', function() {
+      .leftOuterJoin('friend as fr', function() {
         this.on(
           'o.users_id',
           '=',
@@ -255,13 +231,13 @@ const FavorService = {
           user_id
         );
       })
-      .join(
+      .leftOuterJoin(
         'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
-      .join(
+      .leftOuterJoin(
         'user as issuer',
         'o.users_id',
         '=',
