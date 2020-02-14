@@ -45,7 +45,6 @@ describe('Favor Endpoints', function () {
     describe('GET /api/favor', () => {
 
       it('it returns all favors marked public for all users', () => {
-
         return supertest(app)
           .get('/api/favor')
           .set('Authorization', helpers.makeAuthHeader(testUser))
@@ -59,7 +58,7 @@ describe('Favor Endpoints', function () {
                 creator_name: 'Test user 1',
                 creator_username: 'test-user-1',
                 description: 'description 1',
-                expiration_date: null,
+                expiration_date: new Date(favor[0].expiration_date).toISOString(),
                 id: 1,
                 issuer_id: 1,
                 issuer_name: 'Test user 1',
@@ -109,7 +108,7 @@ describe('Favor Endpoints', function () {
           title: 'newFavor',
           description: 'its news',
           creator_id: 1,
-          expiration_date: null,
+          expiration_date: new Date(favor[0].expiration_date).toISOString(),
           publicity: 'public',
           user_location: '',
           tags: '',
@@ -145,7 +144,7 @@ describe('Favor Endpoints', function () {
             creator_name: 'Test user 1',
             creator_username: 'test-user-1',
             description: 'description 1',
-            expiration_date: null,
+            expiration_date: new Date(favor[0].expiration_date).toISOString(),
             id: 1,
             issuer_id: 1,
             issuer_name: 'Test user 1',
@@ -169,7 +168,7 @@ describe('Favor Endpoints', function () {
       })
     });
     describe('PATCH /api/favor/:id', () => {
-      it('properly updates the favor', () =>{
+      it('properly updates the limit', () =>{
         let updates = {
           limit: 2000000001
         }
@@ -183,6 +182,23 @@ describe('Favor Endpoints', function () {
           expect(favorCheck).to.have.property('limit', 2000000001)
         })
       })
+
+      it('properly updates the expiration date', () =>{
+        const date = new Date();
+        let updates = {
+          expiration_date: date
+        }
+        return supertest(app)
+        .patch('/api/favor/1')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .send(updates)
+        .expect(201)
+        .expect(async () =>{
+          let favorCheck = await db.select('*').from('favor').where('id', 1).first();
+          let test = new Date(favorCheck.expiration_date).toLocaleString();
+          expect(test).to.eql(date.toLocaleString())
+        });
+      });
      });
     describe('DELETE /api/favor/:id', () => { });
   })

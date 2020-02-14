@@ -266,7 +266,7 @@ favorRouter
           category = 1;
         }
         if (!expiration_date) {
-          expiration_date = null;
+          expiration_date = Date.now();
         }
         if (!publicity) {
           publicity = 'dm';
@@ -428,7 +428,8 @@ favorRouter
         limit
       } = req.body;
 
-      let newFields;
+
+      let newFields = {};
 
       if (outstanding.length === 0) {
         let {
@@ -446,16 +447,10 @@ favorRouter
         req.params.id
       );
       //dates must be larger
-      if (
-        new Date(
-          expiration_date
-        ).toLocaleString() >=
-        new Date(
-          currentFavor.expiration_date
-        ).toLocaleString()
-      ) {
+      if (new Date(expiration_date).toLocaleString() >=
+        new Date(currentFavor.expiration_date).toLocaleString()) {
         if (!!expiration_date) {
-          newFields.expiration_date = expiration_date;
+          newFields.expiration_date = new Date(expiration_date).toLocaleString();
         }
       } else {
         return res.status(400).json({
@@ -466,7 +461,7 @@ favorRouter
 
       if (limit) {
         if (
-          limit < outstanding.length
+          limit < outstanding.limit
         ) {
           return res.status(400).json({
             error:
@@ -477,14 +472,10 @@ favorRouter
 
       newFields = {
         ...newFields,
-        expiration_date,
         tags,
         category,
-        //        publicity,
         user_location,
         limit
-        //        title,
-        //        description
       };
       const updatedFavor = await FavorService.updateFavor(
         db,
