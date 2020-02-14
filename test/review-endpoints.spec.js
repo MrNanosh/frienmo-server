@@ -82,31 +82,35 @@ describe.only('reviews Endpoints', function() {
             return supertest(app)
               .get(`/api/review/${reviewId}`)
               .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
-              .expect(200)
-              .then(res => {
-                  console.log('RES',res)
+              .expect(res => { 
+                expect(200)
+                expect(res.body.id).to.eql(reviewId)
               })
+              
               
           })
     
         })
 
         describe(`GET /api/review/user/user/:user_id`, () => {
-            beforeEach(() =>
-              helpers.seedUsers( db,testUsers)
-            )    
+          beforeEach('insert Reviews', () =>
+          helpers.seedReviewsTables(
+            db,
+            testUsers,
+            testReviews,
+          )
+        )  
             
-            it(`gets a user id, responding with 200 and gets user`, function() {
+            it(`gets a favor id with correct userid/reviewer id, responding with 200 and gets user`, function() {
                 const user_id = testUsers[0].id
                 console.log("user_id",user_id)
                 return supertest(app)
-                  .get(`/api/review/user/user/${user_id}`)
+                  .get(`/api/review/user/${user_id}`)
                   .set('Authorization', helpers.makeAuthHeader(testUsers[0]))
                   .expect(200)
-                  .then(res => {
-                      console.log("404",res)
+                  .expect(res => {
+                   expect(res.body[0].id).to.eql(user_id)
                   })
-                  
               })
         
             })

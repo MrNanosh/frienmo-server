@@ -41,7 +41,7 @@ function makeReviewsArray(users){
 function makeUsersArray() {
   return [
     {
-      id: 1,
+      id: 2,
       username: 'test-user-1',
       name: 'Test user 1',
       password: 'password',
@@ -49,7 +49,7 @@ function makeUsersArray() {
       description: 'bleh'
     },
     {
-      id: 2,
+      id: 3,
       username: 'test-user-2',
       name: 'Test user 2',
       password: 'password',
