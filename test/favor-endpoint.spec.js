@@ -63,7 +63,7 @@ describe('Favor Endpoints', function () {
                 issuer_id: 1,
                 issuer_name: 'Test user 1',
                 issuer_username: 'test-user-1',
-                limit: null,
+                limit: favor[0].limit,
                 outstanding_id: 1,
                 posted: null,
                 publicity: 'public',
@@ -149,7 +149,7 @@ describe('Favor Endpoints', function () {
             issuer_id: 1,
             issuer_name: 'Test user 1',
             issuer_username: 'test-user-1',
-            limit: null,
+            limit: favor[0].limit,
             outstanding_id: 1,
             posted: null,
             publicity: 'public',
@@ -233,7 +233,29 @@ describe('Favor Endpoints', function () {
 
   describe('GET /api/favor/public', () => { });
 
-  describe('POST api/favor/issue', () => { });
+  describe('POST api/favor/issue', () => {
+    it('updates the user and reciever id if it doesnt exist, otherwise makes a new one', () =>{
+      const updatedUsers = {
+        favor_id: 1,
+        users_id: 1,
+        receiver_id: 2
+      }
+      return supertest(app)
+      .post('/api/favor/issue')
+      .set('Authorization', helpers.makeAuthHeader(testUser))
+      .send(updatedUsers)
+      .expect(201)
+      .expect(async () =>{
+        let test = await db.select('*').from('outstanding').where('id', outstanding[outstanding.length -1].id +1).first();
+        expect(test).to.have.property('id', 3)
+        expect(test).to.have.property('favor_id', updatedUsers.favor_id)
+        expect(test).to.have.property('users_id', updatedUsers.users_id)
+        expect(test).to.have.property('receiver_id', updatedUsers.receiver_id)
+        expect(test).to.have.property('receiver_redeemed', false)
+        expect(test).to.have.property('giver_redeemed', false)
+      });
+    })
+   });
 
   describe('PATCH api/favor/redeem/:favor_id', () => { });
 

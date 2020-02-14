@@ -27,33 +27,38 @@ favorRouter
       .status(200)
       .json({ favors, page, limit });
   });
-
 favorRouter
   .use(requireAuth)
-  .post(
-    '/issue',
-    jsonBodyParser,
-    async (req, res) => {
-      let {
-        favor_id,
-        users_id,
-        receiver_id
-      } = req.body;
-      //TODO:validation needed
-      let db = req.app.get('db');
-      let outstanding = await FavorService.getOutstanding(
-        db,
-        favor_id
-      );
+  .route('/issue')
+  .post(jsonBodyParser, async (req, res) => {
+    let {
+      favor_id,
+      users_id,
+      receiver_id
+    } = req.body;
+    //TODO:validation needed
+    let db = req.app.get('db');
+    let outstanding = await FavorService.getOutstanding(
+      db,
+      favor_id
+    );
+    let checked = false;
+    for (let i = 0; i < outstanding.length; i++) {
+      if (outstanding.receiver_id === null) {
+        console.log('hello2')
+        await FavorService.updateOutstanding(req.app.get('db'), outstanding.id, receiver_id, users_id);
+        checked = true;
+        return res.status(201).send();
+      }
+    }
+    if (!checked) {
       let favor = await FavorService.getFavorById(
         db,
         favor_id
       );
-      if (
-        outstanding.length < favor.limit
-      ) {
+      if (outstanding.length < (favor.limit || 1)) {
         //allow issuing of favor
-        return await FavorService.insertOutstanding(
+        await FavorService.insertOutstanding(
           db,
           {
             favor_id,
@@ -61,8 +66,8 @@ favorRouter
             receiver_id,
             receiver_redeemed: false,
             giver_redeemed: false
-          }
-        );
+          });
+        return res.status(201).send();
       } else {
         return res.status(403).json({
           error:
@@ -70,7 +75,10 @@ favorRouter
         });
       }
     }
+  }
   )
+favorRouter
+.use(requireAuth)
   .get(
     '/personal',
     async (req, res) => {
@@ -342,7 +350,7 @@ favorRouter
       if (
         authuser !== favor.issuer_id ||
         authuser !==
-          favor.receiver_id ||
+        favor.receiver_id ||
         authuser !== favor.creator_id
       ) {
         if (

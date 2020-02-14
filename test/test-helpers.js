@@ -106,7 +106,8 @@ function makeUsersAndFavors() {
       description: 'description 1',
       publicity: 'public',
       creator_id: 1,
-      expiration_date: new Date()
+      expiration_date: new Date(),
+      limit: 2
     },
     {
       id: 2,
