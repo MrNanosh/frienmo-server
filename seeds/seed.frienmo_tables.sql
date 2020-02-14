@@ -1,6 +1,7 @@
 Begin;
 
 TRUNCATE
+
     "user"
     RESTART IDENTITY CASCADE;
 
@@ -17,5 +18,6 @@ INSERT INTO "friend"(
 VALUES
 ('1', '2', 'true'),
 ('2','1', 'true');
+
 
 COMMIT;

@@ -20,10 +20,30 @@ function makeKnexInstance() {
  * create a knex instance connected to postgres
  * @returns {array} of user objects
  */
+
+function makeReviewsArray(users){
+  return [
+    {
+      id: 2,
+      comment: "bad comment",
+      reviewer: users[0].id,
+      reviewee: users[1].id,
+    },
+    {
+      id: 3,
+      comment: "good comment",
+      reviewer: users[1].id,
+      reviewee: users[0].id,
+    },
+  ]
+}
+
+
+
 function makeUsersArray() {
   return [
     {
-      id: 1,
+      id: 2,
       username: 'test-user-1',
       name: 'Test user 1',
       password: 'password',
@@ -31,7 +51,7 @@ function makeUsersArray() {
       description: 'bleh'
     },
     {
-      id: 2,
+      id: 3,
       username: 'test-user-2',
       name: 'Test user 2',
       password: 'password',
@@ -222,6 +242,7 @@ function cleanTables(db) {
  * @returns {Promise} - when users table seeded
  */
 function seedUsers(db, users) {
+
   const preppedUsers = users.map(
     user => ({
       ...user,
@@ -231,16 +252,19 @@ function seedUsers(db, users) {
       )
     })
   );
+
   return db.transaction(async trx => {
     await trx
       .into('user')
       .insert(preppedUsers);
+
 
     await trx.raw(
       `SELECT setval('user_id_seq', ?)`,
       [users[users.length - 1].id]
     );
   });
+
 }
 
 /**
@@ -306,7 +330,32 @@ async function seedUsersFavor(
   });
 }
 
+function seedReviewsTables(db, users, reviews=[]) {
+  // use a transaction to group the queries and auto rollback on any failure
+  return db.transaction(async trx => {
+    await seedUsers(trx, users)
+    await trx.into('review').insert(reviews)
+  })
+}
+
+
+function makeReviewsFixtures() {
+  const testUsers = makeUsersArray()
+  const testReviews = makeReviewsArray(testUsers)
+  return { testUsers, testReviews }
+}
+
+function makeExpectedReview(users, reviewId, reviews) {
+  console.log("reviews",reviews)
+  const expectedreviews = reviews.filter(review => review.reviewee === reviewId)
+  return expectedreviews
+}
+
 module.exports = {
+  makeExpectedReview,
+  makeReviewsFixtures,
+  seedReviewsTables,
+  makeReviewsArray,
   makeKnexInstance,
   makeUsersArray,
   makeUsersAndFavors,
