@@ -1,6 +1,4 @@
-
-const reviewRouter = require('./review/review-router')
-
+const reviewRouter = require('./review/review-router');
 
 require('dotenv').config();
 const express = require('express');
@@ -33,14 +31,9 @@ app.use('/api/auth', authRouter);
 app.use('/api/friend', friendRouter);
 
 app.use('/api/user', userRouter);
-
-
-app.use('/api/auth', authRouter)
-app.use('/api/user', userRouter)
-app.use('/api/review', reviewRouter)
+app.use('/api/review', reviewRouter);
 
 app.use('/api/favor', favorRouter);
-
 
 app.use(function errorHandler(
   error,
