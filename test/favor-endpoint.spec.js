@@ -200,21 +200,32 @@ describe('Favor Endpoints', function () {
         });
       });
      });
-    describe('DELETE /api/favor/:id', () => { });
+    describe('DELETE /api/favor/:id', () => {
+      it('deletes the favor from the database', () =>{
+        return supertest(app)
+        .delete('/api/favor/1')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(204)
+        .expect(async () =>{
+          let favorless = await db.select('*').from('favor').where('id', 1).first()
+          expect(!favorless)
+        })
+      })
+     });
   })
 
   describe('GET /api/favor/friend', () => {
     it('gets favors that were posted by friends and only friends', () => {
-     /* return supertest(app)
-        .get('/ai/favor/friend')
+      return supertest(app)
+        /*.get('/ai/favor/friend')
         .set(
           'Authorization',
           helpers.makeAuthHeader(
             testUser
           )
         )
-        .expect(200)
-        .expect({ hello: 'hello' });*/
+        .expect(200)*/
+        //.expect({ hello: 'hello' });
     })
   });
 
