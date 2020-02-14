@@ -122,8 +122,7 @@ const FavorService = {
         'receiver.id as receiver_id',
         'receiver.name as receiver_name',
         'receiver.username as receiver_username'
-      )
-      .first();
+      );
   },
   getFavorByFriends(
     db,
