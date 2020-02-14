@@ -274,7 +274,7 @@ favorRouter
         if (!user_location) {
           user_location = '';
         }
-        if (!limit) {
+        if (!limit || limit < 1) {
           limit = 2000000000;
         }
 
@@ -298,13 +298,13 @@ favorRouter
           receiver_id: null,
           receiver_redeemed: false,
           giver_redeemed: false
-        }
+        } //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
         let outRes = await FavorService.insertOutstanding(req.app.get('db'), newOutstanding);
         res.status(201).send();
       } catch (error) {
         next(error);
       }
-    }
+    } ///make sure this is right
   );
 
 favorRouter

@@ -123,13 +123,14 @@ describe.only('Favor Endpoints', function () {
           .send(newFavor)
           .expect(201)
           .expect(async () =>{
-            //maybe have formatting like this (function () { var aName = "Barry"; })();
-
-            //let favorCheck = await db.select('*').from('favor').where('id', 3).first();
-            //console.log(favorCheck);
-            let outCheck = await db.select('*').from('outstanding').where('favor_id', 3).first();
-            //console.log(outCheck);
+            let outCheck
+            let favorCheck = await db.select('*').from('favor').where('id', 3).first();
+            console.log(favorCheck);
+            //let outCheck = await db.select('*').from('outstanding').where('favor_id', 3).first();
+            console.log(outCheck);
             //check if the database for favor is right, and outstanding is right
+
+            //insert checks here
           });
       })
     })
@@ -162,12 +163,7 @@ describe.only('Favor Endpoints', function () {
           }
         return supertest(app)
           .get('/api/favor/1')
-          .set(
-            'Authorization',
-            helpers.makeAuthHeader(
-              testUser
-            )
-          )
+          .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect(expectedFavor)
       })
@@ -182,7 +178,10 @@ describe.only('Favor Endpoints', function () {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(updates)
         .expect(201)
-        .expect(updates)
+        .expect(async () =>{
+          let favorCheck = await db.select('*').from('favor').where('id', 1).first();
+          expect(favorCheck).to.have.property('limit', 2000000001)
+        })
       })
      });
     describe('DELETE /api/favor/:id', () => { });
