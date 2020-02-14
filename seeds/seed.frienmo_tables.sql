@@ -3,11 +3,11 @@ Begin;
 TRUNCATE
     "user",
     "friend",
-    "favor",
-    "outstanding",
-    "review",
-    "tags",
-    "tagged"
+    "favor"
+ --   "outstanding",
+--    "review",
+ --   "tags",
+ --   "tagged"
     RESTART IDENTITY CASCADE;
 
 INSERT INTO "user" ( 
@@ -27,29 +27,33 @@ VALUES
 ('1','3', 'true'),
 ('3','1', 'false');
 
-INSERT INTO "favor"(--stuff)
+INSERT INTO "favor"("title", "description", "creator_id", "expiration_date", "publicity",
+"user_location", "tags", "category", "limit", "posted")
 VALUES
---stuff
-;
+('title 1', 'description 1', '1', NOW(), 'dm', ' ', '', '1', 2, NOW()),
+('title 1', 'description 1', '2', NOW(), 'friend', ' ', '', '1', 1, NOW()),
+('title 1', 'description 1', '3', NOW(), 'public', ' ', '', '1', 2, NOW());
 
-INSERT INTO "outstanding"(--stuff)
+INSERT INTO "outstanding"("favor_id", "users_id", "receiver_id", "receiver_redeemed", "giver_redeemed")
 VALUES
---stuff
-;
+('1', '1', '2', 'false', 'false'),
+('2', '2', '3', 'true', 'false'),
+('3', '3', '1', 'false', 'true'),
+('1', '1', '3', 'true', 'true');
 
-INSERT INTO "review"(--stuff)
-VALUES
+--INSERT INTO "review"()
+--VALUES
 --stuff
-;
+--;
     
-INSERT INTO "tags"(--stuff)
-VALUES
+--INSERT INTO "tags"(--stuff)
+--VALUES
 --STUFF
-;
+--;
 
-INSERT INTO "tagged"(--STUFF)
-VALUES
+--INSERT INTO "tagged"(--STUFF)
+--VALUES
 ---STUFF
-;
+--;
 
 COMMIT;
