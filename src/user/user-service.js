@@ -49,6 +49,22 @@ const UserService = {
   },
   getUserById(db, id){
     return db.select(['username', 'name', 'phone', 'description']).from('user').where('id', id).first()
+  },
+  SearchUsers(db, username){
+    return db.select('username', 'name', 'id').from('user')
+    .then(result =>{
+      res = []
+      count = 1;
+      for(let i = 0; i< result.length; i++){
+        if(count < 10){
+          if(result[i].username.includes(username)){
+            res.push(result[i]);
+            count++
+          }
+        }
+      }
+      return res;
+    })
   }
 }
 

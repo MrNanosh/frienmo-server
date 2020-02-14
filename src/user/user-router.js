@@ -89,13 +89,21 @@ userRouter
       }
     }
   )
-  //returns all users: username, name
+  //returns all users: username, name, id
   .get('/', (req, res) => {
     UserService.getAllUsers(
       req.app.get('db')
     ).then(result => {
       res.json(result);
     });
+  })
+  //returns a list of strings with a limit of 10 who's username starts with the input string
+  .get('/search', jsonBodyParser, (req, res) =>{
+    let {username} = req.body;
+    UserService.SearchUsers(req.app.get('db'), username)
+    .then(result =>{
+      res.json(result);
+    })
   })
   //return one user with id: username, name, description, phone#
   .get('/:id', (req, res) => {
