@@ -4,8 +4,8 @@ const FavorService = {
     return db
       .insert(newFavor)
       .into('favor')
-      .returning('*')
-//      .first();
+      .returning('*');
+    //      .first();
   },
   serializeFavor(favor) {
     return {
@@ -23,15 +23,43 @@ const FavorService = {
       limit: favor.limit
     };
   },
-  getAllFavors(db, productsPerPage, page) {
+  getAllFavors(
+    db,
+    productsPerPage,
+    page
+  ) {
     const offset =
-      productsPerPage * (page - 1); 
+      productsPerPage * (page - 1);
     return db('outstanding as o')
-      .join('favor as fa', 'fa.id', '=', 'o.favor_id')
-      .join('user as creator', 'creator.id', '=', 'fa.creator_id')
-      .where('fa.publicity', '=', 'public')
-      .join('user as receiver', 'receiver.id', '=', 'o.receiver_id')
-      .join('user as issuer', 'issuer.id', '=', 'o.users_id')
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'creator.id',
+        '=',
+        'fa.creator_id'
+      )
+      .where(
+        'fa.publicity',
+        '=',
+        'public'
+      )
+      .leftOuterJoin(
+        'user as receiver',
+        'receiver.id',
+        '=',
+        'o.receiver_id'
+      )
+      .leftOuterJoin(
+        'user as issuer',
+        'issuer.id',
+        '=',
+        'o.users_id'
+      )
       .orderBy('posted', 'desc')
       .select(
         'fa.*',
@@ -47,7 +75,7 @@ const FavorService = {
         'receiver.username as receiver_username'
       )
       .limit(productsPerPage)
-      .offset(offset)
+      .offset(offset);
   },
   getFavorById(db, id) {
     // db
@@ -57,11 +85,31 @@ const FavorService = {
     //   .first(); //excludes personal
 
     return db('outstanding as o')
-      .join('favor as fa', 'fa.id', '=', 'o.favor_id')
-      .join('user as creator', 'creator.id', '=', 'fa.creator_id')
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'creator.id',
+        '=',
+        'fa.creator_id'
+      )
       .where('fa.id', '=', id)
-      .join('user as receiver', 'receiver.id', '=', 'o.receiver_id')
-      .join('user as issuer', 'o.users_id','=','issuer.id')
+      .join(
+        'user as receiver',
+        'receiver.id',
+        '=',
+        'o.receiver_id'
+      )
+      .join(
+        'user as issuer',
+        'o.users_id',
+        '=',
+        'issuer.id'
+      )
       .select(
         'fa.*',
         'o.id as outstanding_id',
