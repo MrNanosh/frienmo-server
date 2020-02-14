@@ -14,7 +14,6 @@ reviewRouter// when posting get auth from reviewer
 
         for (const [key, value] of Object.entries(newReview))
       if (value == null){
-      console.log(newReview)
         return res.status(400).json({
           error: `Missing '${key}' in request body`
         
@@ -22,14 +21,12 @@ reviewRouter// when posting get auth from reviewer
       }
 
         newReview.reviewer = req.user.id
-        console.log("newReview", newReview)
 
         ReviewsService.insertReview(
             req.app.get('db'),
             newReview
           )
             .then(review => {
-                console.log('REVIEW',review)
               res
                 .status(201)
                 .location(path.posix.join(req.originalUrl, `/${review.id}`))

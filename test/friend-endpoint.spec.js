@@ -3,7 +3,7 @@ const app = require('../src/app')
 const helpers = require('./test-helpers')
 
 
-describe('Auth Endpoints', function () {
+describe('Friend Endpoints', function () {
 
     let db
 
@@ -26,26 +26,27 @@ describe('Auth Endpoints', function () {
     before('cleanup', () => helpers.cleanTables(db))
 
     afterEach('cleanup', () => helpers.cleanTables(db))
+    beforeEach('insert users', () =>
+        helpers.seedUsersFavor(
+            db,
+            testUsers,
+            favor,
+            outstanding,
+            review,
+            friend
+        )
+    )
 
     describe('GET /api/friend', () => {
-        beforeEach('insert users', () =>
-            helpers.seedUsersFavor(
-                db,
-                testUsers,
-                favor,
-                outstanding,
-                review,
-                friend
-            )
-        )
+
         it('returns all accepted friends for a user', () => {
-            const OutputUser=[{
+            const OutputUser = [{
                 id: 2,
                 fav_accepted: 0,
                 fav_requested: 0,
-                username: 'test-user-2',
-                name: 'Test user 2',
-                description: null
+                username: testUsers[1].username,
+                name: testUsers[1].name,
+                description: testUsers[1].description
             }]
             return supertest(app)
                 .get('/api/friend')
@@ -56,16 +57,6 @@ describe('Auth Endpoints', function () {
     })
 
     describe('POST /api/friend', () => {
-        beforeEach('insert users, favors, friends, etc', () =>
-            helpers.seedUsersFavor(
-                db,
-                testUsers,
-                favor,
-                outstanding,
-                review,
-                friend
-            )
-        )
         it('makes a new friend request with one accepted and the other unaccepted', () => {
             const friendToFriend = {
                 friend_id: 3
@@ -94,16 +85,6 @@ describe('Auth Endpoints', function () {
     })
 
     describe('PATCH /api/friend/:id', () => {
-        beforeEach('insert users, favors, friends, etc', () =>
-            helpers.seedUsersFavor(
-                db,
-                testUsers,
-                favor,
-                outstanding,
-                review,
-                friend
-            )
-        )
         it('it updates the accepted property to true', () => {
             const friendToConfirm = {
                 friend_id: 1
@@ -122,16 +103,6 @@ describe('Auth Endpoints', function () {
     })
 
     describe('DELETE /api/friend/:id', () => {
-        beforeEach('insert users, favors, friends, etc', () =>
-            helpers.seedUsersFavor(
-                db,
-                testUsers,
-                favor,
-                outstanding,
-                review,
-                friend
-            )
-        )
         it('it deletes the friendship', () => {
             return supertest(app)
                 .delete('/api/friend/1')
@@ -154,31 +125,21 @@ describe('Auth Endpoints', function () {
         })
     })
 
-    describe('GET /api/friend/pending', () =>{
-        beforeEach('insert users', () =>
-            helpers.seedUsersFavor(
-                db,
-                testUsers,
-                favor,
-                outstanding,
-                review,
-                friend
-            )
-        )
-        it('returns all friends requesting friendship', () =>{
-            const OutputUser=[{
+    describe('GET /api/friend/pending', () => {
+        it('returns all friends requesting friendship', () => {
+            const OutputUser = [{
                 id: 1,
                 fav_accepted: 0,
                 fav_requested: 0,
-                username: 'test-user-1',
-                name: 'Test user 1  ',
-                description: null
+                username: testUser.username,
+                name: testUser.name,
+                description: testUser.description
             }]
             return supertest(app)
-            .get('/api/friend/pending')
-            .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
-            .expect(200)
-            .expect(OutputUser)
+                .get('/api/friend/pending')
+                .set('Authorization', helpers.makeAuthHeader(testUsers[2]))
+                .expect(200)
+                .expect(OutputUser)
         })
     })
 });

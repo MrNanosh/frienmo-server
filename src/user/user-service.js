@@ -42,7 +42,7 @@ const UserService = {
     }
   },
   getAllUsers(db){
-    return db.select(['username', 'name','password']).from('user')
+    return db.select(['username', 'name', 'id']).from('user')
       .then(res =>{
         return res;
       })
