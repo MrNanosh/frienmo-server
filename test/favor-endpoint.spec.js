@@ -222,6 +222,7 @@ describe.only('Favor Endpoints', function () {
 
   describe.only('GET /api/favor/friend', () => {
     it('gets favors that were posted by friends and only friends', () => {
+      let date = new Date(favor[0].expiration_date).toISOString();
       return supertest(app)
         .get('/api/favor/friend')
         .set(
@@ -232,52 +233,54 @@ describe.only('Favor Endpoints', function () {
         )
         .expect(200)
         .expect({
-          favors: [{
-            favor_id: 3,
-            title: 'title 3',
-            description: 'description 3',
-            category: null,
-            expiration_date: new Date(favor[0].expiration_date).toISOString(),
-            publicity: 'friend',
-            user_location: null,
-            tags: null,
-            limit: 2,
-            outstanding_id: 3,
-            receiver_redeemed: true,
-            issuer_redeemed: true,
-            creator_id: 1,
-            creator_name: 'Test user 1',
-            creator_username: 'test-user-1',
-            issuer_id: 1,
-            issuer_name: 'Test user 1',
-            issuer_username: 'test-user-1',
-            receiver_id: 2,
-            receiver_name: 'Test user 2',
-            receiver_username: 'test-user-2'
-          },
-          {
-            favor_id: 4,
-            title: 'title 4',
-            description: 'description 4',
-            category: null,
-            expiration_date: null,
-            publicity: 'friend',
-            user_location: null,
-            tags: null,
-            limit: null,
-            outstanding_id: 4,
-            receiver_redeemed: true,
-            issuer_redeemed: false,
-            creator_id: 2,
-            creator_name: 'Test user 2',
-            creator_username: 'test-user-2',
-            issuer_id: 2,
-            issuer_name: 'Test user 2',
-            issuer_username: 'test-user-2',
-            receiver_id: 1,
-            receiver_name: 'Test user 1',
-            receiver_username: 'test-user-1'
-          }],
+          favors: [
+            {
+              favor_id: 3,
+              title: 'title 3',
+              description: 'description 3',
+              category: null,
+              expiration_date: new Date(favor[0].expiration_date).toISOString(),
+              publicity: 'friend',
+              user_location: null,
+              tags: null,
+              limit: 2,
+              outstanding_id: 3,
+              receiver_redeemed: true,
+              issuer_redeemed: true,
+              creator_id: 1,
+              creator_name: 'Test user 1',
+              creator_username: 'test-user-1',
+              issuer_id: 1,
+              issuer_name: 'Test user 1',
+              issuer_username: 'test-user-1',
+              receiver_id: 2,
+              receiver_name: 'Test user 2',
+              receiver_username: 'test-user-2'
+            },
+            {
+              favor_id: 4,
+              title: 'title 4',
+              description: 'description 4',
+              category: null,
+              expiration_date: null,
+              publicity: 'friend',
+              user_location: null,
+              tags: null,
+              limit: null,
+              outstanding_id: 4,
+              receiver_redeemed: true,
+              issuer_redeemed: false,
+              creator_id: 2,
+              creator_name: 'Test user 2',
+              creator_username: 'test-user-2',
+              issuer_id: 2,
+              issuer_name: 'Test user 2',
+              issuer_username: 'test-user-2',
+              receiver_id: 1,
+              receiver_name: 'Test user 1',
+              receiver_username: 'test-user-1'
+            }            
+          ],
           limit: 30,
           page: 1
         });
