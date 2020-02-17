@@ -33,65 +33,75 @@ favorRouter
   .post(
     jsonBodyParser,
     async (req, res) => {
+      //TODO: issuer could be anybody tighten validation
       let {
         favor_id,
         users_id,
         receiver_id
       } = req.body;
-      //TODO:validation needed
+
       let db = req.app.get('db');
+
       let outstanding = await FavorService.getOutstanding(
         db,
         favor_id
       );
-      let checked = false;
+
       for (
         let i = 0;
         i < outstanding.length;
         i++
       ) {
         if (
-          outstanding.receiver_id ===
+          outstanding[i].receiver_id ===
           null
         ) {
-          console.log('hello2');
           await FavorService.updateOutstanding(
             req.app.get('db'),
             outstanding.id,
             receiver_id,
             users_id
           );
-          checked = true;
-          return res.status(201).send();
+
+          const updatedOutstanding = FavorService.getOutstandingById(
+            req.app.get('db'),
+            outstanding.id
+          );
+
+          return res
+            .status(204)
+            .json(updatedOutstanding);
+          // 204 is appropriate for this case
         }
       }
-      if (!checked) {
-        let favor = await FavorService.getFavorById(
+
+      // get a favor to check the limit if you can't find a null one.
+      let favor = await FavorService.getFavorById(
+        db,
+        favor_id
+      );
+      favor = favor[0];
+      if (
+        outstanding.length < favor.limit
+      ) {
+        //allow issuing of favor
+        await FavorService.insertOutstanding(
           db,
-          favor_id
+          {
+            favor_id,
+            users_id,
+            receiver_id,
+            receiver_redeemed: false,
+            giver_redeemed: false
+          }
         );
-        if (
-          outstanding.length <
-          (favor.limit || 1)
-        ) {
-          //allow issuing of favor
-          await FavorService.insertOutstanding(
-            db,
-            {
-              favor_id,
-              users_id,
-              receiver_id,
-              receiver_redeemed: false,
-              giver_redeemed: false
-            }
-          );
-          return res.status(201).send();
-        } else {
-          return res.status(403).json({
-            error:
-              'cannot issue any more of these favors without increasing limit'
-          });
-        }
+
+        return res.status(201).send();
+      } else {
+        return res.status(403).json({
+          error:
+            'cannot issue any more of these favors without increasing limit'
+        });
       }
     }
   );
@@ -185,6 +195,7 @@ favorRouter
     '/redeem/:favor_id',
     jsonBodyParser,
     async (req, res) => {
+      //TODO: validate for the expiration date as well
       //gets specific ticket
       const db = req.app.get('db');
       let { outstanding_id } = req.body;
@@ -299,6 +310,7 @@ favorRouter
           category = 1;
         }
         if (!expiration_date) {
+          //TODO: make the expiration later
           expiration_date = Date.now();
         }
         if (!publicity) {
@@ -358,10 +370,12 @@ favorRouter
      *or the creator id matches the auth user
      *or any public one
      */
-    const favor = await FavorService.getFavorById(
+    const allOutstanding = await FavorService.getFavorById(
       req.app.get('db'),
       req.params.id
     );
+
+    const favor = allOutstanding[0];
 
     if (!favor) {
       return res.status(401).json({
@@ -440,8 +454,10 @@ favorRouter
         }
       }
     }
-
-    return res.status(200).json(favor);
+    //TODO: add pagination?
+    return res
+      .status(200)
+      .json(allOutstanding);
   })
   .patch(
     jsonBodyParser,
@@ -474,33 +490,44 @@ favorRouter
           description
         };
       }
-      const currentFavor = await FavorService.getFavorById(
+      const favor = await FavorService.getFavorById(
         db,
         req.params.id
       );
+
+      const currentFavor = favor[0]; //done for comparison purposes
+      //
       //dates must be larger
-      if (
-        new Date(
-          expiration_date
-        ).toLocaleString() >=
-        new Date(
-          currentFavor.expiration_date
-        ).toLocaleString()
-      ) {
-        if (!!expiration_date) {
-          newFields.expiration_date = new Date(
+      if (expiration_date) {
+        if (
+          new Date(
             expiration_date
-          ).toLocaleString();
+          ).toLocaleString() >=
+          new Date(
+            currentFavor.expiration_date
+          ).toLocaleString()
+        ) {
+          if (!expiration_date) {
+            let expiration_date = new Date(
+              expiration_date
+            );
+            newFields = {
+              ...newFields,
+              expiration_date
+            };
+          }
+        } else {
+          return res.status(400).json({
+            error:
+              'can only increase date'
+          });
         }
-      } else {
-        return res.status(400).json({
-          error:
-            'can only increase date'
-        });
       }
 
       if (limit) {
-        if (limit < outstanding.limit) {
+        if (
+          limit < outstanding.length
+        ) {
           return res.status(400).json({
             error:
               'can not decrease limit below outstanding favors'
@@ -515,15 +542,13 @@ favorRouter
         user_location,
         limit
       };
-      const updatedFavor = await FavorService.updateFavor(
+      await FavorService.updateFavor(
         db,
         req.params.id,
         newFields
       );
 
-      return res
-        .status(201)
-        .json(updatedFavor);
+      return res.status(204).end();
     }
   )
   .delete(async (req, res) => {
