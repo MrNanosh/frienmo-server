@@ -379,13 +379,13 @@ const FavorService = {
           user_id
         );
       })
-      .join(
+      .leftOuterJoin(
         'user as receiver',
         'receiver.id',
         '=',
         'o.receiver_id'
       )
-      .join(
+      .leftOuterJoin(
         'user as issuer',
         'o.users_id',
         '=',
