@@ -195,6 +195,7 @@ favorRouter
     '/redeem/:favor_id',
     jsonBodyParser,
     async (req, res) => {
+      //TODO: validate for the expiration date as well
       //gets specific ticket
       const db = req.app.get('db');
       let { outstanding_id } = req.body;
@@ -309,6 +310,7 @@ favorRouter
           category = 1;
         }
         if (!expiration_date) {
+          //TODO: make the expiration later
           expiration_date = Date.now();
         }
         if (!publicity) {
