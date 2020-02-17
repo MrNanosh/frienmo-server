@@ -19,6 +19,7 @@ favorRouter.route("/").get(async (req, res) => {
 });
 favorRouter
   .use(requireAuth)
+<<<<<<< HEAD
   .route("/issue")
   .post(jsonBodyParser, async (req, res) => {
     let { favor_id, users_id, receiver_id } = req.body;
@@ -67,6 +68,104 @@ favorRouter
     let user_id = req.user.id;
     if (!user_id) {
       return res.status(404).json("must have an authorized account to use");
+=======
+  .route('/issue')
+  .post(
+    jsonBodyParser,
+    async (req, res) => {
+      let {
+        favor_id,
+        users_id,
+        receiver_id
+      } = req.body;
+      //TODO:validation needed
+      let db = req.app.get('db');
+      let outstanding = await FavorService.getOutstanding(
+        db,
+        favor_id
+      );
+      let checked = false;
+      for (
+        let i = 0;
+        i < outstanding.length;
+        i++
+      ) {
+        if (
+          outstanding.receiver_id ===
+          null
+        ) {
+          console.log('hello2');
+          await FavorService.updateOutstanding(
+            req.app.get('db'),
+            outstanding.id,
+            receiver_id,
+            users_id
+          );
+          checked = true;
+          return res.status(201).send();
+        }
+      }
+      if (!checked) {
+        let favor = await FavorService.getFavorById(
+          db,
+          favor_id
+        );
+        if (
+          outstanding.length <
+          (favor.limit || 1)
+        ) {
+          //allow issuing of favor
+          await FavorService.insertOutstanding(
+            db,
+            {
+              favor_id,
+              users_id,
+              receiver_id,
+              receiver_redeemed: false,
+              giver_redeemed: false
+            }
+          );
+          return res.status(201).send();
+        } else {
+          return res.status(403).json({
+            error:
+              'cannot issue any more of these favors without increasing limit'
+          });
+        }
+      }
+    }
+  );
+favorRouter
+  .use(requireAuth)
+  .get(
+    '/personal',
+    async (req, res) => {
+      let db = req.app.get('db');
+      let { limit, page } = req.query;
+      let user_id = req.user.id;
+      if (!user_id) {
+        return res
+          .status(404)
+          .json(
+            'must have an authorized account to use'
+          );
+      }
+      if (!limit) {
+        limit = 30;
+      }
+      if (!page) {
+        page = 1;
+      }
+      let favors = await FavorService.getPersonalFavors(
+        db,
+        user_id,
+        limit,
+        page
+      );
+      return res
+        .status(200)
+        .json({ favors, page, limit });
+>>>>>>> master
     }
     if (!limit) {
       limit = 30;
@@ -116,6 +215,7 @@ favorRouter
 
     let confirmation;
 
+<<<<<<< HEAD
     //favor must exist
     let ticket = await FavorService.getOutstanding(db, req.params.favor_id)[0];
     if (!ticket) {
@@ -148,6 +248,71 @@ favorRouter
       redeemedTicket = await FavorService.redeem(db, outstanding_id, {
         giver_redeemed: true
       });
+=======
+      //favor must exist
+      let ticket = await FavorService.getOutstanding(
+        db,
+        Number(req.params.favor_id)
+      );
+      ticket = ticket[0];
+      if (!ticket) {
+        return res.status(404).json({
+          error: 'favor must exist'
+        });
+      }
+      //must be not redeemed by the user
+      let person;
+      if (!req.user) {
+        return res.status(401).json({
+          error:
+            'you must be logged in to redeem a favor'
+        });
+      } else {
+        person = req.user.id;
+      }
+      let redeemedTicket;
+      if (
+        ticket.giver_redeemed === true
+      ) {
+        res.status(403).json({
+          error:
+            'this favor has already been redeemed'
+        });
+      }
+
+      console.log(person, ticket);
+      if (ticket.users_id === person) {
+        if (
+          ticket.receiver_redeemed ===
+          false
+        ) {
+          return res.status(403).json({
+            error:
+              'this user may not yet confirm the favor'
+          });
+        }
+        redeemedTicket = await FavorService.redeem(
+          db,
+          outstanding_id,
+          { giver_redeemed: true }
+        );
+      } else if (
+        ticket.receiver_id === person
+      ) {
+        redeemedTicket = await FavorService.redeem(
+          db,
+          outstanding_id,
+          { receiver_redeemed: true }
+        );
+      } else {
+        return res.status(403).json({
+          error:
+            'this user is unrelated'
+        });
+      }
+
+      return res.status(204).end();
+>>>>>>> master
     }
     if (ticket.receiver_id === person) {
       redeemedTicket = await FavorService.redeem(db, outstanding_id, {
@@ -270,7 +435,12 @@ favorRouter
       //if it returns a non public favor
       if (
         authuser !== favor.issuer_id ||
+<<<<<<< HEAD
         authuser !== favor.receiver_id ||
+=======
+        authuser !==
+          favor.receiver_id ||
+>>>>>>> master
         authuser !== favor.creator_id
       ) {
         if (favor.publicity === "friends") {
@@ -316,9 +486,13 @@ favorRouter
     // allowed: update any field if favor_outstanding does not reference its id
     const outstanding = await FavorService.getOutstanding(db, req.params.id);
 
+<<<<<<< HEAD
     let { expiration_date, tags, category, user_location, limit } = req.body;
 
     let newFields = {};
+=======
+      let newFields = {};
+>>>>>>> master
 
     if (outstanding.length === 0) {
       let { title, description, publicity } = req.body;
@@ -336,6 +510,7 @@ favorRouter
       if (!!expiration_date) {
         newFields.expiration_date = new Date(expiration_date).toLocaleString();
       }
+<<<<<<< HEAD
     } else {
       return res.status(400).json({
         error: "can only increase date"
@@ -344,12 +519,34 @@ favorRouter
 
     if (limit) {
       if (limit < outstanding.limit) {
+=======
+      const currentFavor = await FavorService.getFavorById(
+        db,
+        req.params.id
+      );
+      //dates must be larger
+      if (
+        new Date(
+          expiration_date
+        ).toLocaleString() >=
+        new Date(
+          currentFavor.expiration_date
+        ).toLocaleString()
+      ) {
+        if (!!expiration_date) {
+          newFields.expiration_date = new Date(
+            expiration_date
+          ).toLocaleString();
+        }
+      } else {
+>>>>>>> master
         return res.status(400).json({
           error: "can not decrease limit below outstanding favors"
         });
       }
     }
 
+<<<<<<< HEAD
     newFields = {
       ...newFields,
       tags,
@@ -362,6 +559,29 @@ favorRouter
       req.params.id,
       newFields
     );
+=======
+      if (limit) {
+        if (limit < outstanding.limit) {
+          return res.status(400).json({
+            error:
+              'can not decrease limit below outstanding favors'
+          });
+        }
+      }
+
+      newFields = {
+        ...newFields,
+        tags,
+        category,
+        user_location,
+        limit
+      };
+      const updatedFavor = await FavorService.updateFavor(
+        db,
+        req.params.id,
+        newFields
+      );
+>>>>>>> master
 
     return res.status(201).json(updatedFavor);
   })

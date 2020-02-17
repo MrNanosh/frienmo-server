@@ -18,6 +18,7 @@ const FavorService = {
       limit: favor.limit
     };
   },
+<<<<<<< HEAD
   getAllFavors(db, productsPerPage, page) {
     const offset = productsPerPage * (page - 1);
     return db("outstanding as o")
@@ -27,6 +28,46 @@ const FavorService = {
       .leftOuterJoin("user as receiver", "receiver.id", "=", "o.receiver_id")
       .leftOuterJoin("user as issuer", "issuer.id", "=", "o.users_id")
       .orderBy("posted", "desc")
+=======
+  getAllFavors(
+    db,
+    productsPerPage,
+    page
+  ) {
+    const offset =
+      productsPerPage * (page - 1);
+    return db('outstanding as o')
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'creator.id',
+        '=',
+        'fa.creator_id'
+      )
+      .where(
+        'fa.publicity',
+        '=',
+        'public'
+      )
+      .leftOuterJoin(
+        'user as receiver',
+        'receiver.id',
+        '=',
+        'o.receiver_id'
+      )
+      .leftOuterJoin(
+        'user as issuer',
+        'issuer.id',
+        '=',
+        'o.users_id'
+      )
+      .orderBy('posted', 'desc')
+>>>>>>> master
       .select(
         "fa.*",
         "o.id as outstanding_id",
@@ -74,6 +115,7 @@ const FavorService = {
     //excludes personal
     const offset = productsPerPage * (page - 1);
 
+<<<<<<< HEAD
     return db("outstanding as o")
       .join("favor as fa", "fa.id", "=", "o.favor_id")
       .join("user as creator", "creator.id", "=", "fa.creator_id")
@@ -85,6 +127,40 @@ const FavorService = {
           "o.receiver_id"
         );
       })
+=======
+    return db('outstanding as o')
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'creator.id',
+        '=',
+        'fa.creator_id'
+      )
+      .where(
+        'fa.publicity',
+        '=',
+        'friend'
+      )
+      .leftOuterJoin(
+        'friend as fr',
+        function() {
+          this.on(
+            'fr.user_id',
+            '=',
+            'o.users_id'
+          ).orOn(
+            'fr.friend_id',
+            '=',
+            'o.receiver_id'
+          );
+        }
+      )
+>>>>>>> master
       .where(function() {
         this.where("fr.user_id", "=", user_id).orWhere(
           "fr.friend_id",
@@ -118,6 +194,7 @@ const FavorService = {
       .limit(productsPerPage)
       .offset(offset);
   },
+<<<<<<< HEAD
   getPersonalFavors(db, user_id, productsPerPage, page) {
     const offset = productsPerPage * (page - 1);
     return db("outstanding as o")
@@ -131,6 +208,44 @@ const FavorService = {
           "o.receiver_id"
         );
       })
+=======
+  getPersonalFavors(
+    db,
+    user_id,
+    productsPerPage,
+    page
+  ) {
+    const offset =
+      productsPerPage * (page - 1);
+    return db('outstanding as o')
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'creator.id',
+        '=',
+        'fa.creator_id'
+      )
+      .where('fa.publicity', '=', 'dm')
+      .leftOuterJoin(
+        'friend as fr',
+        function() {
+          this.on(
+            'o.users_id',
+            '=',
+            'fr.user_id'
+          ).orOn(
+            'fr.friend_id',
+            '=',
+            'o.receiver_id'
+          );
+        }
+      )
+>>>>>>> master
       .where(function() {
         this.where("fr.user_id", "=", user_id).orWhere(
           "fr.friend_id",
@@ -181,9 +296,19 @@ const FavorService = {
       })
       .select("*");
   },
+<<<<<<< HEAD
   redeem(db, outstanding_id, confirmation) {
     return db("outstanding")
       .where({ outstanding_id })
+=======
+  redeem(
+    db,
+    outstanding_id,
+    confirmation
+  ) {
+    return db('outstanding')
+      .where({ id: outstanding_id })
+>>>>>>> master
       .update(confirmation);
   },
   insertOutstanding(db, newOutstanding) {
@@ -212,9 +337,25 @@ const FavorService = {
           user_id
         );
       })
+<<<<<<< HEAD
       .join("user as receiver", "receiver.id", "=", "o.receiver_id")
       .join("user as issuer", "o.users_id", "=", "issuer.id")
       .orderBy("posted", "desc")
+=======
+      .leftOuterJoin(
+        'user as receiver',
+        'receiver.id',
+        '=',
+        'o.receiver_id'
+      )
+      .leftOuterJoin(
+        'user as issuer',
+        'o.users_id',
+        '=',
+        'issuer.id'
+      )
+      .orderBy('posted', 'desc')
+>>>>>>> master
       .select(
         "fa.id as favor_id",
         "fa.title as title",
@@ -239,11 +380,29 @@ const FavorService = {
       .limit(productsPerPage)
       .offset(offset);
   },
+<<<<<<< HEAD
   updateOutstanding(db, outstanding_id, receiver_id, users_id) {
     return db.where("outstanding_id", outstanding_id).update({
       receiver_id: receiver_id,
       user_id: users_id
     });
+=======
+  updateOutstanding(
+    db,
+    outstanding_id,
+    receiver_id,
+    users_id
+  ) {
+    return db
+      .where(
+        'outstanding_id',
+        outstanding_id
+      )
+      .update({
+        receiver_id: receiver_id,
+        user_id: users_id
+      });
+>>>>>>> master
   }
 };
 
