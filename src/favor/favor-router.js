@@ -33,6 +33,7 @@ favorRouter
   .post(
     jsonBodyParser,
     async (req, res) => {
+      //TODO: issuer could be anybody tighten validation
       let {
         favor_id,
         users_id,
@@ -79,7 +80,7 @@ favorRouter
         db,
         favor_id
       );
-
+      favor = favor[0];
       if (
         outstanding.length < favor.limit
       ) {
