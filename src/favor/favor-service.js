@@ -411,7 +411,8 @@ const FavorService = {
     return db
       .insert(newOutstanding)
       .into('outstanding')
-      .returning('*');
+      .returning('*')
+      .first();
   },
   getPublicFavors(
     db,

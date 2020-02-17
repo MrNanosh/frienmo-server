@@ -95,6 +95,7 @@ favorRouter
             giver_redeemed: false
           }
         );
+
         return res.status(201).send();
       } else {
         return res.status(403).json({
@@ -495,28 +496,30 @@ favorRouter
       const currentFavor = favor[0]; //done for comparison purposes
       //
       //dates must be larger
-      if (
-        new Date(
-          expiration_date
-        ).toLocaleString() >=
-        new Date(
-          currentFavor.expiration_date
-        ).toLocaleString()
-      ) {
-        if (!expiration_date) {
-          let expiration_date = new Date(
+      if (expiration_date) {
+        if (
+          new Date(
             expiration_date
-          );
-          newFields = {
-            ...newFields,
-            expiration_date
-          };
+          ).toLocaleString() >=
+          new Date(
+            currentFavor.expiration_date
+          ).toLocaleString()
+        ) {
+          if (!expiration_date) {
+            let expiration_date = new Date(
+              expiration_date
+            );
+            newFields = {
+              ...newFields,
+              expiration_date
+            };
+          }
+        } else {
+          return res.status(400).json({
+            error:
+              'can only increase date'
+          });
         }
-      } else {
-        return res.status(400).json({
-          error:
-            'can only increase date'
-        });
       }
 
       if (limit) {
