@@ -220,7 +220,7 @@ describe.only('Favor Endpoints', function () {
     });
   })
 
-  describe.skip('GET /api/favor/friend', () => {
+  describe('GET /api/favor/friend', () => {
     it('gets favors that were posted by friends and only friends', () => {
       return supertest(app)
         .get('/api/favor/friend')
@@ -232,12 +232,58 @@ describe.only('Favor Endpoints', function () {
         )
         .expect(200)
         .expect({
-          favors: [],
+          favors: [{
+            favor_id: 3,
+            title: 'title 3',
+            description: 'description 3',
+            category: null,
+            expiration_date: new Date(favor[0].expiration_date).toISOString(),
+            publicity: 'friend',
+            user_location: null,
+            tags: null,
+            limit: 2,
+            outstanding_id: 3,
+            receiver_redeemed: true,
+            issuer_redeemed: true,
+            creator_id: 1,
+            creator_name: 'Test user 1',
+            creator_username: 'test-user-1',
+            issuer_id: 1,
+            issuer_name: 'Test user 1',
+            issuer_username: 'test-user-1',
+            receiver_id: 2,
+            receiver_name: 'Test user 2',
+            receiver_username: 'test-user-2'
+          },
+          {
+            favor_id: 4,
+            title: 'title 4',
+            description: 'description 4',
+            category: null,
+            expiration_date: null,
+            publicity: 'friend',
+            user_location: null,
+            tags: null,
+            limit: null,
+            outstanding_id: 4,
+            receiver_redeemed: true,
+            issuer_redeemed: false,
+            creator_id: 2,
+            creator_name: 'Test user 2',
+            creator_username: 'test-user-2',
+            issuer_id: 2,
+            issuer_name: 'Test user 2',
+            issuer_username: 'test-user-2',
+            receiver_id: 1,
+            receiver_name: 'Test user 1',
+            receiver_username: 'test-user-1'
+          }],
           limit: 30,
           page: 1
         });
     })
   }); //returns each favor correctly, but twice, I assume its an issue with the join method but not sure how to fix
+      //update: i think i fixed it but check with Dana to make sure it works right 
 
   describe('GET /api/favor/personal', () => { });
 
@@ -248,7 +294,52 @@ describe.only('Favor Endpoints', function () {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(200)
         .expect({
-          favors: [],
+          favors: [    {
+            favor_id: 3,
+            title: 'title 3',
+            description: 'description 3',
+            category: null,
+            expiration_date: new Date(favor[0].expiration_date).toISOString(),
+            publicity: 'friend',
+            user_location: null,
+            tags: null,
+            limit: 2,
+            outstanding_id: 3,
+            receiver_redeemed: true,
+            issuer_redeemed: true,
+            creator_id: 1,
+            creator_name: 'Test user 1',
+            creator_username: 'test-user-1',
+            issuer_id: 1,
+            issuer_name: 'Test user 1',
+            issuer_username: 'test-user-1',
+            receiver_id: 2,
+            receiver_name: 'Test user 2',
+            receiver_username: 'test-user-2'
+          },
+          {
+            favor_id: 4,
+            title: 'title 4',
+            description: 'description 4',
+            category: null,
+            expiration_date: null,
+            publicity: 'friend',
+            user_location: null,
+            tags: null,
+            limit: null,
+            outstanding_id: 4,
+            receiver_redeemed: true,
+            issuer_redeemed: false,
+            creator_id: 2,
+            creator_name: 'Test user 2',
+            creator_username: 'test-user-2',
+            issuer_id: 2,
+            issuer_name: 'Test user 2',
+            issuer_username: 'test-user-2',
+            receiver_id: 1,
+            receiver_name: 'Test user 1',
+            receiver_username: 'test-user-1'
+          }],
           limit: 30,
           page: 1
         })
@@ -269,7 +360,7 @@ describe.only('Favor Endpoints', function () {
         .expect(201)
         .expect(async () => {
           let test = await db.select('*').from('outstanding').where('id', outstanding[outstanding.length - 1].id + 1).first();
-          expect(test).to.have.property('id', 3)
+          expect(test).to.have.property('id', 5)
           expect(test).to.have.property('favor_id', updatedUsers.favor_id)
           expect(test).to.have.property('users_id', updatedUsers.users_id)
           expect(test).to.have.property('receiver_id', updatedUsers.receiver_id)

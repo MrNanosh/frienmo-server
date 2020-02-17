@@ -146,7 +146,9 @@ const FavorService = {
       .leftOuterJoin( 'friend as fr',
         function() {
           this.on('fr.user_id', '=', 'o.users_id')
-          .orOn('fr.friend_id', '=', 'o.receiver_id');
+          .andOn('fr.friend_id', '=', 'o.receiver_id');
+          ///////////////////
+          //changed line above from orOn to andOn due to a duplication bug, need to make sure it works a lot more
         }
       )
       .where(function() {

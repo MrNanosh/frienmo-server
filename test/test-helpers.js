@@ -120,15 +120,17 @@ function makeUsersAndFavors() {
       id: 3,
       title: 'title 3',
       description: 'description 3',
-      publicity: 'public',
-      creator_id: 3
+      publicity: 'friend',
+      creator_id: 1,
+      expiration_date: new Date(),
+      limit: 2
     },
     {
       id: 4,
       title: 'title 4',
       description: 'description 4',
-      publicity: 'public',
-      creator_id: 4
+      publicity: 'friend',
+      creator_id: 2
     },
     {
       id: 5,
@@ -155,23 +157,23 @@ function makeUsersAndFavors() {
       receiver_redeemed: true,
       giver_redeemed: false
     },
-    /*{
+    {
       id: 3,
-      favor_id: 2,
+      favor_id: 3,
       users_id: 1,
       receiver_id: 2,
-      receiver_redeemed: false,
-      giver_redeemed: false
-    },
-    /*{
-      id: 4,
-      favor_id: 2,
-      users_id: 1,
-      receiver_id: 2,
-      receiver_redeemed: false,
-      giver_redeemed: false
+      receiver_redeemed: true,
+      giver_redeemed: true
     },
     {
+      id: 4,
+      favor_id: 4,
+      users_id: 2,
+      receiver_id: 1,
+      receiver_redeemed: true,
+      giver_redeemed: false
+    },
+    /*{
       id: 5,
       favor_id: 2,
       users_id: 1,
