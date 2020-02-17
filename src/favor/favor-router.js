@@ -450,7 +450,7 @@ favorRouter
         }
       }
     }
-
+    //TODO: add pagination?
     return res
       .status(200)
       .json(allOutstanding);
@@ -486,10 +486,13 @@ favorRouter
           description
         };
       }
-      const currentFavor = await FavorService.getFavorById(
+      const favor = await FavorService.getFavorById(
         db,
         req.params.id
       );
+
+      const currentFavor = favor[0]; //done for comparison purposes
+      //
       //dates must be larger
       if (
         new Date(
@@ -499,10 +502,14 @@ favorRouter
           currentFavor.expiration_date
         ).toLocaleString()
       ) {
-        if (!!expiration_date) {
-          newFields.expiration_date = new Date(
+        if (!expiration_date) {
+          let expiration_date = new Date(
             expiration_date
-          ).toLocaleString();
+          );
+          newFields = {
+            ...newFields,
+            expiration_date
+          };
         }
       } else {
         return res.status(400).json({
@@ -512,7 +519,9 @@ favorRouter
       }
 
       if (limit) {
-        if (limit < outstanding.limit) {
+        if (
+          limit < outstanding.length
+        ) {
           return res.status(400).json({
             error:
               'can not decrease limit below outstanding favors'
@@ -527,15 +536,13 @@ favorRouter
         user_location,
         limit
       };
-      const updatedFavor = await FavorService.updateFavor(
+      await FavorService.updateFavor(
         db,
         req.params.id,
         newFields
       );
 
-      return res
-        .status(201)
-        .json(updatedFavor);
+      return res.status(204).end();
     }
   )
   .delete(async (req, res) => {
