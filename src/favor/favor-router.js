@@ -63,7 +63,7 @@ favorRouter
             users_id
           );
 
-          const updatedOutstanding = FavorService.getOutstandingById(
+          const updatedOutstanding = await FavorService.getOutstandingById(
             req.app.get('db'),
             outstanding.id
           );
@@ -85,7 +85,7 @@ favorRouter
         outstanding.length < favor.limit
       ) {
         //allow issuing of favor
-        await FavorService.insertOutstanding(
+        let newOutstanding = await FavorService.insertOutstanding(
           db,
           {
             favor_id,
@@ -96,7 +96,9 @@ favorRouter
           }
         );
 
-        return res.status(201).send();
+        return res
+          .status(201)
+          .json(newOutstanding);
       } else {
         return res.status(403).json({
           error:

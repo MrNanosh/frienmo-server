@@ -411,8 +411,7 @@ const FavorService = {
     return db
       .insert(newOutstanding)
       .into('outstanding')
-      .returning('*')
-      .first();
+      .returning('*');
   },
   getPublicFavors(
     db,
@@ -532,8 +531,8 @@ const FavorService = {
         outstanding_id
       )
       .update({
-        receiver_id: receiver_id,
-        user_id: users_id
+        receiver_id,
+        users_id
       });
   }
 };
