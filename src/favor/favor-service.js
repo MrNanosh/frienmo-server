@@ -525,11 +525,8 @@ const FavorService = {
     receiver_id,
     users_id
   ) {
-    return db
-      .where(
-        'outstanding_id',
-        outstanding_id
-      )
+    return db('outstanding')
+      .where('id', outstanding_id)
       .update({
         receiver_id,
         users_id
