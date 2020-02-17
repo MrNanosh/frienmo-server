@@ -31,11 +31,35 @@ const FavorService = {
     const offset =
       productsPerPage * (page - 1);
     return db('outstanding as o')
-      .join('favor as fa', 'fa.id', '=', 'o.favor_id')
-      .join('user as creator', 'creator.id', '=', 'fa.creator_id')
-      .where( 'fa.publicity', '=', 'public' )
-      .leftOuterJoin( 'user as receiver', 'receiver.id', '=', 'o.receiver_id' )
-      .leftOuterJoin( 'user as issuer', 'issuer.id', '=', 'o.users_id' )
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'creator.id',
+        '=',
+        'fa.creator_id'
+      )
+      .where(
+        'fa.publicity',
+        '=',
+        'public'
+      )
+      .leftOuterJoin(
+        'user as receiver',
+        'receiver.id',
+        '=',
+        'o.receiver_id'
+      )
+      .leftOuterJoin(
+        'user as issuer',
+        'issuer.id',
+        '=',
+        'o.users_id'
+      )
       .orderBy('posted', 'desc')
       .select(
         'fa.*',
@@ -128,17 +152,20 @@ const FavorService = {
         '=',
         'friend'
       )
-      .leftOuterJoin('friend as fr', function() {
-        this.on(
-          'fr.user_id',
-          '=',
-          'o.users_id'
-        ).orOn(
-          'fr.friend_id',
-          '=',
-          'o.receiver_id'
-        );
-      })
+      .leftOuterJoin(
+        'friend as fr',
+        function() {
+          this.on(
+            'fr.user_id',
+            '=',
+            'o.users_id'
+          ).orOn(
+            'fr.friend_id',
+            '=',
+            'o.receiver_id'
+          );
+        }
+      )
       .where(function() {
         this.where(
           'fr.user_id',
@@ -208,17 +235,20 @@ const FavorService = {
         'fa.creator_id'
       )
       .where('fa.publicity', '=', 'dm')
-      .leftOuterJoin('friend as fr', function() {
-        this.on(
-          'o.users_id',
-          '=',
-          'fr.user_id'
-        ).orOn(
-          'fr.friend_id',
-          '=',
-          'o.receiver_id'
-        );
-      })
+      .leftOuterJoin(
+        'friend as fr',
+        function() {
+          this.on(
+            'o.users_id',
+            '=',
+            'fr.user_id'
+          ).orOn(
+            'fr.friend_id',
+            '=',
+            'o.receiver_id'
+          );
+        }
+      )
       .where(function() {
         this.where(
           'fr.user_id',
@@ -289,7 +319,7 @@ const FavorService = {
     confirmation
   ) {
     return db('outstanding')
-      .where({ outstanding_id })
+      .where({ id: outstanding_id })
       .update(confirmation);
   },
   insertOutstanding(
@@ -386,11 +416,21 @@ const FavorService = {
       .limit(productsPerPage)
       .offset(offset);
   },
-  updateOutstanding(db, outstanding_id, receiver_id, users_id){
-    return db.where('outstanding_id', outstanding_id).update({
-      receiver_id: receiver_id,
-      user_id: users_id
-    })
+  updateOutstanding(
+    db,
+    outstanding_id,
+    receiver_id,
+    users_id
+  ) {
+    return db
+      .where(
+        'outstanding_id',
+        outstanding_id
+      )
+      .update({
+        receiver_id: receiver_id,
+        user_id: users_id
+      });
   }
 };
 
