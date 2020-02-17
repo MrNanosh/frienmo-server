@@ -66,7 +66,10 @@ favorRouter
             req.app.get('db'),
             outstanding.id
           );
-          return res.status(204).send();
+
+          return res
+            .status(204)
+            .json(updatedOutstanding);
           // 204 is appropriate for this case
         }
       }
