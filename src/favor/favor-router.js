@@ -366,10 +366,12 @@ favorRouter
      *or the creator id matches the auth user
      *or any public one
      */
-    const favor = await FavorService.getFavorById(
+    const allOutstanding = await FavorService.getFavorById(
       req.app.get('db'),
       req.params.id
     );
+
+    const favor = allOutstanding[0];
 
     if (!favor) {
       return res.status(401).json({
@@ -449,7 +451,9 @@ favorRouter
       }
     }
 
-    return res.status(200).json(favor);
+    return res
+      .status(200)
+      .json(allOutstanding);
   })
   .patch(
     jsonBodyParser,
