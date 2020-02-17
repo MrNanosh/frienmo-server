@@ -155,7 +155,7 @@ function makeUsersAndFavors() {
       receiver_redeemed: true,
       giver_redeemed: false
     },
-  /*  {
+    /*{
       id: 3,
       favor_id: 2,
       users_id: 1,
@@ -163,8 +163,8 @@ function makeUsersAndFavors() {
       receiver_redeemed: false,
       giver_redeemed: false
     },
-    {
-      id: 3,
+    /*{
+      id: 4,
       favor_id: 2,
       users_id: 1,
       receiver_id: 2,
@@ -172,7 +172,7 @@ function makeUsersAndFavors() {
       giver_redeemed: false
     },
     {
-      id: 3,
+      id: 5,
       favor_id: 2,
       users_id: 1,
       receiver_id: 2,
@@ -180,7 +180,7 @@ function makeUsersAndFavors() {
       giver_redeemed: false
     },
     {
-      id: 3,
+      id: 6,
       favor_id: 2,
       users_id: 1,
       receiver_id: 2,

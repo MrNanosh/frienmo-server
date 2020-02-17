@@ -139,60 +139,22 @@ const FavorService = {
       productsPerPage * (page - 1);
 
     return db('outstanding as o')
-      .join(
-        'favor as fa',
-        'fa.id',
-        '=',
-        'o.favor_id'
+      .join('favor as fa', 'fa.id', '=', 'o.favor_id'
       )
-      .join(
-        'user as creator',
-        'creator.id',
-        '=',
-        'fa.creator_id'
-      )
-      .where(
-        'fa.publicity',
-        '=',
-        'friend'
-      )
-      .leftOuterJoin(
-        'friend as fr',
+      .join('user as creator', 'creator.id', '=', 'fa.creator_id')
+      .where('fa.publicity', '=', 'friend')
+      .leftOuterJoin( 'friend as fr',
         function() {
-          this.on(
-            'fr.user_id',
-            '=',
-            'o.users_id'
-          ).orOn(
-            'fr.friend_id',
-            '=',
-            'o.receiver_id'
-          );
+          this.on('fr.user_id', '=', 'o.users_id')
+          .orOn('fr.friend_id', '=', 'o.receiver_id');
         }
       )
       .where(function() {
-        this.where(
-          'fr.user_id',
-          '=',
-          user_id
-        ).orWhere(
-          'fr.friend_id',
-          '=',
-          user_id
-        );
+        this.where( 'fr.user_id', '=', user_id)
+        .orWhere( 'fr.friend_id', '=', user_id);
       })
-      .leftOuterJoin(
-        'user as receiver',
-        'receiver.id',
-        '=',
-        'o.receiver_id'
-      )
-      .leftOuterJoin(
-        'user as issuer',
-        'o.users_id',
-        '=',
-        'issuer.id'
-      )
+      .leftOuterJoin( 'user as receiver', 'receiver.id', '=', 'o.receiver_id')
+      .leftOuterJoin( 'user as issuer', 'o.users_id', '=', 'issuer.id')
       .select(
         'fa.id as favor_id',
         'fa.title as title',
@@ -412,7 +374,7 @@ const FavorService = {
       .insert(newOutstanding)
       .into('outstanding')
       .returning('*')
-      .first();
+      //.first();
   },
   getPublicFavors(
     db,
