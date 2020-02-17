@@ -38,60 +38,65 @@ favorRouter
         users_id,
         receiver_id
       } = req.body;
-      //TODO:validation needed
+
       let db = req.app.get('db');
+
       let outstanding = await FavorService.getOutstanding(
         db,
         favor_id
       );
-      let checked = false;
+
       for (
         let i = 0;
         i < outstanding.length;
         i++
       ) {
         if (
-          outstanding.receiver_id ===
+          outstanding[i].receiver_id ===
           null
         ) {
-          console.log('hello2');
           await FavorService.updateOutstanding(
             req.app.get('db'),
             outstanding.id,
             receiver_id,
             users_id
           );
-          checked = true;
-          return res.status(201).send();
+
+          const updatedOutstanding = FavorService.getOutstandingById(
+            req.app.get('db'),
+            outstanding.id
+          );
+          return res.status(204).send();
+          // 204 is appropriate for this case
         }
       }
-      if (!checked) {
-        let favor = await FavorService.getFavorById(
+
+      // get a favor to check the limit if you can't find a null one.
+      let favor = await FavorService.getFavorById(
+        db,
+        favor_id
+      );
+
+      if (
+        outstanding.length < favor.limit
+      ) {
+        //allow issuing of favor
+        await FavorService.insertOutstanding(
           db,
-          favor_id
+          {
+            favor_id,
+            users_id,
+            receiver_id,
+            receiver_redeemed: false,
+            giver_redeemed: false
+          }
         );
-        if (
-          outstanding.length <
-          (favor.limit || 1)
-        ) {
-          //allow issuing of favor
-          await FavorService.insertOutstanding(
-            db,
-            {
-              favor_id,
-              users_id,
-              receiver_id,
-              receiver_redeemed: false,
-              giver_redeemed: false
-            }
-          );
-          return res.status(201).send();
-        } else {
-          return res.status(403).json({
-            error:
-              'cannot issue any more of these favors without increasing limit'
-          });
-        }
+        return res.status(201).send();
+      } else {
+        return res.status(403).json({
+          error:
+            'cannot issue any more of these favors without increasing limit'
+        });
       }
     }
   );

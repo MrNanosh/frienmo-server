@@ -64,6 +64,8 @@ const FavorService = {
       .select(
         'fa.*',
         'o.id as outstanding_id',
+        'o.receiver_redeemed as receiver_redeemed',
+        'o.giver_redeemed as issuer_redeemed',
         'creator.id as creator_id',
         'creator.name as creator_name',
         'creator.username as creator_username',
@@ -113,6 +115,8 @@ const FavorService = {
       .select(
         'fa.*',
         'o.id as outstanding_id',
+        'o.receiver_redeemed as receiver_redeemed',
+        'o.giver_redeemed as issuer_redeemed',
         'creator.id as creator_id',
         'creator.name as creator_name',
         'creator.username as creator_username',
@@ -200,6 +204,8 @@ const FavorService = {
         'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
+        'o.receiver_redeemed as receiver_redeemed',
+        'o.giver_redeemed as issuer_redeemed',
         'creator.id as creator_id',
         'creator.name as creator_name',
         'creator.username as creator_username',
@@ -283,6 +289,8 @@ const FavorService = {
         'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
+        'o.receiver_redeemed as receiver_redeemed',
+        'o.giver_redeemed as issuer_redeemed',
         'creator.id as creator_id',
         'creator.name as creator_name',
         'creator.username as creator_username',
@@ -312,6 +320,56 @@ const FavorService = {
         favor_id
       })
       .select('*');
+  },
+  getOutstandingById(
+    db,
+    outstanding_id
+  ) {
+    return db('outstanding as o')
+      .where(
+        'o.id',
+        '=',
+        outstanding_id
+      )
+      .join(
+        'favor as fa',
+        'fa.id',
+        '=',
+        'o.favor_id'
+      )
+      .join(
+        'user as creator',
+        'creator.id',
+        '=',
+        'fa.creator_id'
+      )
+      .leftOuterJoin(
+        'user as receiver',
+        'receiver.id',
+        '=',
+        'o.receiver_id'
+      )
+      .leftOuterJoin(
+        'user as issuer',
+        'o.users_id',
+        '=',
+        'issuer.id'
+      )
+      .select(
+        'fa.*',
+        'o.id as outstanding_id',
+        'o.receiver_redeemed as receiver_redeemed',
+        'o.giver_redeemed as issuer_redeemed',
+        'creator.id as creator_id',
+        'creator.name as creator_name',
+        'creator.username as creator_username',
+        'issuer.id as issuer_id',
+        'issuer.name as issuer_name',
+        'issuer.username as issuer_username',
+        'receiver.id as receiver_id',
+        'receiver.name as receiver_name',
+        'receiver.username as receiver_username'
+      );
   },
   redeem(
     db,
@@ -403,6 +461,8 @@ const FavorService = {
         'fa.tags as tags',
         'fa.limit as limit',
         'o.id as outstanding_id',
+        'o.receiver_redeemed as receiver_redeemed',
+        'o.giver_redeemed as issuer_redeemed',
         'creator.id as creator_id',
         'creator.name as creator_name',
         'creator.username as creator_username',
