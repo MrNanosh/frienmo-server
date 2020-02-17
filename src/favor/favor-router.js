@@ -176,89 +176,90 @@ favorRouter
 favorRouter
   .use(requireAuth)
   .route("/")
-  .post(
-    jsonBodyParser,
-    async (req, res, next) => {
-      let {
-        title,
-        description,
-        tags,
-        category,
-        expiration_date,
-        publicity,
-        user_location,
-        limit
-      } = req.body;
+  .post(jsonBodyParser, async (req, res, next) => {
+    let {
+      title,
+      description,
+      tags,
+      category,
+      expiration_date,
+      publicity,
+      user_location,
+      limit
+    } = req.body;
 
-      for (const field of ["title", "description"]) {
-        if (!req.body[field])
-          return res.status(400).json({
-            error: `Missing '${field}' in request body`
-          });
+    for (const field of ["title", "description"]) {
+      if (!req.body[field])
+        return res.status(400).json({
+          error: `Missing '${field}' in request body`
+        });
+    }
+
+    try {
+      let posted = new Date();
+      if (!req.user.id) {
+        throw new Error("protected");
+      }
+      let creator_id = req.user.id;
+      //TODO: validate tags
+      //TODO: handle tags
+      if (!tags) {
+        tags = "";
+      }
+      if (!category) {
+        category = 1;
+      }
+      if (!expiration_date) {
+        expiration_date = new Date();
+      }
+      if (!publicity) {
+        publicity = "dm";
+      }
+      if (!user_location) {
+        user_location = "";
+      }
+      if (!limit || limit < 1) {
+        limit = 2000000000;
       }
 
-      try {
-        let posted = new Date();
-        if (!req.user.id) {
-          throw new Error("protected");
-        }
-        let creator_id = req.user.id;
-        //TODO: validate tags
-        //TODO: handle tags
-        if (!tags) {
-          tags = "";
-        }
-        if (!category) {
-          category = 1;
-        }
-        if (!expiration_date) {
-          expiration_date = new Date();
-        }
-        if (!publicity) {
-          publicity = "dm";
-        }
-        if (!user_location) {
-          user_location = "";
-        }
-        if (!limit || limit < 1) {
-          limit = 2000000000;
-        }
+      let newFavor = {
+        title: title,
+        description: description,
+        creator_id: req.user.id,
+        tags: tags,
+        category: category,
+        expiration_date: expiration_date,
+        publicity: publicity,
+        user_location: user_location,
+        limit: limit,
+        posted: posted
+      };
 
-        let newFavor = {
-          title: title,
-          description: description,
-          creator_id: req.user.id,
-          tags: tags,
-          category: category,
-          expiration_date: expiration_date,
-          publicity: publicity,
-          user_location: user_location,
-          limit: limit,
-          posted: null
-        };
+      let favorRes = await FavorService.insertFavor(
+        req.app.get("db"),
+        newFavor
+      );
+      //TODO: ask the team about this
+      let newOutstanding = {
+        favor_id: favorRes[0].id,
+        users_id: favorRes[0].creator_id, //might be better as null by default
+        receiver_id: null,
+        receiver_redeemed: false,
+        giver_redeemed: false
+      }; //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
+      let [outRes] = await FavorService.insertOutstanding(
+        req.app.get("db"),
+        newOutstanding
+      );
 
-        let favorRes = await FavorService.insertFavor(
-          req.app.get("db"),
-          newFavor
-        );
-        //TODO: ask the team about this
-        let newOutstanding = {
-          favor_id: favorRes[0].id,
-          users_id: favorRes[0].creator_id, //might be better as null by default
-          receiver_id: null,
-          receiver_redeemed: false,
-          giver_redeemed: false
-        }; //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
-        let outRes = await FavorService.insertOutstanding(
-          req.app.get("db"),
-          newOutstanding
-        );
-        res.status(201).send();
-      } catch (error) {
-        next(error);
-      }
-    } ///make sure this is right
-  );
+      res
+        .status(201)
+        .location(path.posix.join(req.originalUrl, `/${outRes.favor_id}`))
+        .send();
+    } catch (error) {
+      next(error);
+    }
+  });
 
 favorRouter
   .use(requireAuth)
