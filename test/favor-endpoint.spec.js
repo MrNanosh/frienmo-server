@@ -283,9 +283,43 @@ describe.only('Favor Endpoints', function () {
         });
     })
   }); //returns each favor correctly, but twice, I assume its an issue with the join method but not sure how to fix
-      //update: i think i fixed it but check with Dana to make sure it works right 
+  //update: i think i fixed it but check with Dana to make sure it works right 
 
-  describe('GET /api/favor/personal', () => { });
+  describe('GET /api/favor/personal', () => {
+    it('gets favors with the publicity of dm', () => {
+      return supertest(app)
+        .get('/api/favor/personal')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200)
+        .expect({
+          favors: [{
+            favor_id: 5,
+            title: 'title 5',
+            description: 'description 5',
+            category: null,
+            expiration_date: null,
+            publicity: 'dm',
+            user_location: null,
+            tags: null,
+            limit: null,
+            outstanding_id: 5,
+            receiver_redeemed: true,
+            issuer_redeemed: true,
+            creator_id: 5,
+            creator_name: 'Test user 5',
+            creator_username: 'test-user-5',
+            issuer_id: 1,
+            issuer_name: 'Test user 1',
+            issuer_username: 'test-user-1',
+            receiver_id: 2,
+            receiver_name: 'Test user 2',
+            receiver_username: 'test-user-2'
+          }],
+          limit: 30,
+          page: 1
+        })
+    })
+  });
 
   describe('GET /api/favor/public', () => {
     it('gets favors that were posted by friends and only friends', () => {
@@ -294,7 +328,7 @@ describe.only('Favor Endpoints', function () {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(200)
         .expect({
-          favors: [    {
+          favors: [{
             favor_id: 3,
             title: 'title 3',
             description: 'description 3',
@@ -360,7 +394,7 @@ describe.only('Favor Endpoints', function () {
         .expect(201)
         .expect(async () => {
           let test = await db.select('*').from('outstanding').where('id', outstanding[outstanding.length - 1].id + 1).first();
-          expect(test).to.have.property('id', 5)
+          expect(test).to.have.property('id', 6)
           expect(test).to.have.property('favor_id', updatedUsers.favor_id)
           expect(test).to.have.property('users_id', updatedUsers.users_id)
           expect(test).to.have.property('receiver_id', updatedUsers.receiver_id)

@@ -136,7 +136,7 @@ function makeUsersAndFavors() {
       id: 5,
       title: 'title 5',
       description: 'description 5',
-      publicity: 'public',
+      publicity: 'dm',
       creator_id: 5
     }
   ];
@@ -173,15 +173,15 @@ function makeUsersAndFavors() {
       receiver_redeemed: true,
       giver_redeemed: false
     },
-    /*{
+    {
       id: 5,
-      favor_id: 2,
+      favor_id: 5,
       users_id: 1,
       receiver_id: 2,
-      receiver_redeemed: false,
-      giver_redeemed: false
+      receiver_redeemed: true,
+      giver_redeemed: true
     },
-    {
+    /*{
       id: 6,
       favor_id: 2,
       users_id: 1,
