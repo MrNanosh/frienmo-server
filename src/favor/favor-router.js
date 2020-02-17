@@ -65,7 +65,7 @@ favorRouter
 
           const updatedOutstanding = await FavorService.getOutstandingById(
             req.app.get('db'),
-            outstanding.id
+            outstanding[i].id
           );
 
           return res
