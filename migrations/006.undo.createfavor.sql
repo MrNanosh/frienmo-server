@@ -1,2 +1,2 @@
 DROP TABLE IF EXISTS "favor";
-DROP TYPE "public";
+DROP TYPE IF EXISTS "public";
