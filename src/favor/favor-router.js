@@ -160,6 +160,7 @@ favorRouter
       limit,
       page
     );
+    favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this 
     return res
       .status(200)
       .json({ favors, page, limit });

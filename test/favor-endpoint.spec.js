@@ -220,7 +220,7 @@ describe.only('Favor Endpoints', function () {
     });
   })
 
-  describe('GET /api/favor/friend', () => {
+  describe.only('GET /api/favor/friend', () => {
     it('gets favors that were posted by friends and only friends', () => {
       return supertest(app)
         .get('/api/favor/friend')

@@ -143,17 +143,17 @@ const FavorService = {
       )
       .join('user as creator', 'creator.id', '=', 'fa.creator_id')
       .where('fa.publicity', '=', 'friend')
-      .leftOuterJoin( 'friend as fr',
+      .join('friend as fr',
         function() {
           this.on('fr.user_id', '=', 'o.users_id')
-          .andOn('fr.friend_id', '=', 'o.receiver_id');
+          .orOn('fr.friend_id', '=', 'o.receiver_id')
           ///////////////////
           //changed line above from orOn to andOn due to a duplication bug, need to make sure it works a lot more
         }
       )
       .where(function() {
         this.where( 'fr.user_id', '=', user_id)
-        .orWhere( 'fr.friend_id', '=', user_id);
+        .orWhere('fr.friend_id', '=', user_id);
       })
       .leftOuterJoin( 'user as receiver', 'receiver.id', '=', 'o.receiver_id')
       .leftOuterJoin( 'user as issuer', 'o.users_id', '=', 'issuer.id')
@@ -388,73 +388,15 @@ const FavorService = {
       productsPerPage * (page - 1);
     return (
       db('outstanding as o')
-        .join(
-          'favor as fa',
-          'fa.id',
-          '=',
-          'o.favor_id'
-        )
-        .join(
-          'user as creator',
-          'creator.id',
-          '=',
-          'fa.creator_id'
-        )
-        .where(
-          'fa.publicity',
-          '=',
-          'public'
-        )
-        // .join('friend as fr', function() {
-        //   this.on(
-        //     'fr.user_id',
-        //     '=',
-        //     'o.users_id'
-        //   ).orOn(
-        //     'fr.friend_id',
-        //     '=',
-        //     'o.receiver_id'
-        //   );
-        // })
-        // .where(function() {
-        //   this.where(
-        //     'fr.user_id',
-        //     '=',
-        //     user_id
-        //   ).orWhere(
-        //     'fr.friend_id',
-        //     '=',
-        //     user_id
-        //   );
-        // })
-        .leftOuterJoin(
-          'user as receiver',
-          'receiver.id',
-          '=',
-          'o.receiver_id'
-        )
-        .leftOuterJoin(
-          'user as issuer',
-          'o.users_id',
-          '=',
-          'issuer.id'
-        )
+        .join('favor as fa', 'fa.id', '=', 'o.favor_id')
+        .join( 'user as creator', 'creator.id', '=', 'fa.creator_id')
+        .where('fa.publicity', '=',  'public')
+        .leftOuterJoin('user as receiver', 'receiver.id', '=', 'o.receiver_id')
+        .leftOuterJoin('user as issuer',  'o.users_id', '=', 'issuer.id')
         .where(function() {
-          this.where(
-            'fa.creator_id',
-            '=',
-            user_id
-          )
-            .orWhere(
-              'issuer.id',
-              '=',
-              user_id
-            )
-            .orWhere(
-              'receiver.id',
-              '=',
-              user_id
-            );
+          this.where('fa.creator_id', '=', user_id)
+            .orWhere('issuer.id', '=', user_id)
+            .orWhere('receiver.id', '=', user_id);
         })
         .orderBy('posted', 'desc')
         .select(
