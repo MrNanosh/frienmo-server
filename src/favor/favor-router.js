@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const FavorService = require('./favor-service');
 const FriendService = require('../friend/friend-service');
+const { add } = require('date-fns');
 const {
   requireAuth
 } = require('../middleware/jwt-auth');
@@ -162,7 +163,7 @@ favorRouter
       limit,
       page
     );
-   // favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this 
+    // favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -314,7 +315,16 @@ favorRouter
         }
         if (!expiration_date) {
           //TODO: make the expiration later
-          expiration_date = Date.now();
+          expiration_date = add(
+            Date.now(),
+            {
+              months: 1,
+              days: 1,
+              hours: 1,
+              minutes: 1,
+              seconds: 1
+            }
+          );
         }
         if (!publicity) {
           publicity = 'dm';
@@ -502,8 +512,17 @@ favorRouter
       //
       //dates must be larger
       if (expiration_date) {
-        if (new Date(expiration_date).toLocaleString() >= new Date(currentFavor.expiration_date).toLocaleString()) {
-          let date = new Date(expiration_date);
+        if (
+          new Date(
+            expiration_date
+          ).toLocaleString() >=
+          new Date(
+            currentFavor.expiration_date
+          ).toLocaleString()
+        ) {
+          let date = new Date(
+            expiration_date
+          );
           newFields = {
             ...newFields,
             expiration_date: date
