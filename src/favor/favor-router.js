@@ -234,7 +234,7 @@ favorRouter
         });
       }
 
-      console.log(person, ticket);
+      //console.log(person, ticket);
       if (ticket.users_id === person) {
         if (
           ticket.receiver_redeemed ===
