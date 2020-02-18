@@ -162,6 +162,7 @@ favorRouter
       limit,
       page
     );
+   // favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this 
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -501,23 +502,12 @@ favorRouter
       //
       //dates must be larger
       if (expiration_date) {
-        if (
-          new Date(
-            expiration_date
-          ).toLocaleString() >=
-          new Date(
-            currentFavor.expiration_date
-          ).toLocaleString()
-        ) {
-          if (!expiration_date) {
-            let expiration_date = new Date(
-              expiration_date
-            );
-            newFields = {
-              ...newFields,
-              expiration_date
-            };
-          }
+        if (new Date(expiration_date).toLocaleString() >= new Date(currentFavor.expiration_date).toLocaleString()) {
+          let date = new Date(expiration_date);
+          newFields = {
+            ...newFields,
+            expiration_date: date
+          };
         } else {
           return res.status(400).json({
             error:

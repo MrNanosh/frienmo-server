@@ -137,85 +137,97 @@ const FavorService = {
     //excludes personal
     const offset =
       productsPerPage * (page - 1);
-
-    return db('outstanding as o')
-      .join(
-        'favor as fa',
-        'fa.id',
-        '=',
-        'o.favor_id'
-      )
-      .join(
-        'user as creator',
-        'creator.id',
-        '=',
-        'fa.creator_id'
-      )
-      .where(
-        'fa.publicity',
-        '=',
-        'friend'
-      )
-      .leftOuterJoin(
-        'friend as fr',
-        function() {
-          this.on(
+    function friends(fr, o) {
+      return db('outstanding as o')
+        .join(
+          'favor as fa',
+          'fa.id',
+          '=',
+          'o.favor_id'
+        )
+        .join(
+          'user as creator',
+          'creator.id',
+          '=',
+          'fa.creator_id'
+        )
+        .where(
+          'fa.publicity',
+          '=',
+          'friend'
+        )
+        .leftOuterJoin(
+          'friend as fr',
+          fr,
+          '=',
+          o
+        )
+        .where(function() {
+          this.where(
             'fr.user_id',
             '=',
-            'o.users_id'
-          ).orOn(
+            user_id
+          ).orWhere(
             'fr.friend_id',
             '=',
-            'o.receiver_id'
+            user_id
           );
-        }
-      )
-      .where(function() {
-        this.where(
-          'fr.user_id',
+        })
+        .leftOuterJoin(
+          'user as receiver',
+          'receiver.id',
           '=',
-          user_id
-        ).orWhere(
-          'fr.friend_id',
+          'o.receiver_id'
+        )
+        .leftOuterJoin(
+          'user as issuer',
+          'o.users_id',
           '=',
-          user_id
+          'issuer.id'
+        )
+        .select(
+          'fa.id as favor_id',
+          'fa.title as title',
+          'fa.description as description',
+          'fa.category as category',
+          'fa.expiration_date as expiration_date',
+          'fa.publicity as publicity',
+          'fa.user_location as user_location',
+          'fa.tags as tags',
+          'fa.limit as limit',
+          'o.id as outstanding_id',
+          'o.receiver_redeemed as receiver_redeemed',
+          'o.giver_redeemed as issuer_redeemed',
+          'creator.id as creator_id',
+          'creator.name as creator_name',
+          'creator.username as creator_username',
+          'issuer.id as issuer_id',
+          'issuer.name as issuer_name',
+          'issuer.username as issuer_username',
+          'receiver.id as receiver_id',
+          'receiver.name as receiver_name',
+          'receiver.username as receiver_username'
         );
-      })
-      .leftOuterJoin(
-        'user as receiver',
-        'receiver.id',
-        '=',
-        'o.receiver_id'
-      )
-      .leftOuterJoin(
-        'user as issuer',
-        'o.users_id',
-        '=',
-        'issuer.id'
-      )
-      .select(
-        'fa.id as favor_id',
-        'fa.title as title',
-        'fa.description as description',
-        'fa.category as category',
-        'fa.expiration_date as expiration_date',
-        'fa.publicity as publicity',
-        'fa.user_location as user_location',
-        'fa.tags as tags',
-        'fa.limit as limit',
-        'o.id as outstanding_id',
-        'o.receiver_redeemed as receiver_redeemed',
-        'o.giver_redeemed as issuer_redeemed',
-        'creator.id as creator_id',
-        'creator.name as creator_name',
-        'creator.username as creator_username',
-        'issuer.id as issuer_id',
-        'issuer.name as issuer_name',
-        'issuer.username as issuer_username',
-        'receiver.id as receiver_id',
-        'receiver.name as receiver_name',
-        'receiver.username as receiver_username'
-      )
+    }
+
+    return friends(
+      'fr.friend_id',
+      'o.users_id'
+    )
+      .union([
+        friends(
+          'fr.user_id',
+          'o.users_id'
+        ),
+        friends(
+          'fr.user_id',
+          'o.users_id'
+        ),
+        friends(
+          'fr.friend_id',
+          'o.users_id'
+        )
+      ])
       .limit(productsPerPage)
       .offset(offset);
   },
@@ -412,6 +424,7 @@ const FavorService = {
       .insert(newOutstanding)
       .into('outstanding')
       .returning('*');
+
   },
   getPublicFavors(
     db,
@@ -423,73 +436,15 @@ const FavorService = {
       productsPerPage * (page - 1);
     return (
       db('outstanding as o')
-        .join(
-          'favor as fa',
-          'fa.id',
-          '=',
-          'o.favor_id'
-        )
-        .join(
-          'user as creator',
-          'creator.id',
-          '=',
-          'fa.creator_id'
-        )
-        .where(
-          'fa.publicity',
-          '=',
-          'public'
-        )
-        // .join('friend as fr', function() {
-        //   this.on(
-        //     'fr.user_id',
-        //     '=',
-        //     'o.users_id'
-        //   ).orOn(
-        //     'fr.friend_id',
-        //     '=',
-        //     'o.receiver_id'
-        //   );
-        // })
-        // .where(function() {
-        //   this.where(
-        //     'fr.user_id',
-        //     '=',
-        //     user_id
-        //   ).orWhere(
-        //     'fr.friend_id',
-        //     '=',
-        //     user_id
-        //   );
-        // })
-        .leftOuterJoin(
-          'user as receiver',
-          'receiver.id',
-          '=',
-          'o.receiver_id'
-        )
-        .leftOuterJoin(
-          'user as issuer',
-          'o.users_id',
-          '=',
-          'issuer.id'
-        )
+        .join('favor as fa', 'fa.id', '=', 'o.favor_id')
+        .join( 'user as creator', 'creator.id', '=', 'fa.creator_id')
+        .where('fa.publicity', '=',  'public')
+        .leftOuterJoin('user as receiver', 'receiver.id', '=', 'o.receiver_id')
+        .leftOuterJoin('user as issuer',  'o.users_id', '=', 'issuer.id')
         .where(function() {
-          this.where(
-            'fa.creator_id',
-            '=',
-            user_id
-          )
-            .orWhere(
-              'issuer.id',
-              '=',
-              user_id
-            )
-            .orWhere(
-              'receiver.id',
-              '=',
-              user_id
-            );
+          this.where('fa.creator_id', '=', user_id)
+            .orWhere('issuer.id', '=', user_id)
+            .orWhere('receiver.id', '=', user_id);
         })
         .orderBy('posted', 'desc')
         .select(
