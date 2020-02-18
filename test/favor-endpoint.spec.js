@@ -108,7 +108,7 @@ describe.only('Favor Endpoints', function () {
     describe('POST /api/favor', () => {
       it('it returns 201 and the right information', () => {
         const newFavor = {
-          id: 3,
+          id: 6,
           title: 'newFavor',
           description: 'its news',
           creator_id: 1,
@@ -125,9 +125,9 @@ describe.only('Favor Endpoints', function () {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(newFavor)
           .expect(201)
-          .expect(async () => {
+          .expect(async res => {
             let outCheck
-            let favorCheck = await db.select('*').from('favor').where('id', 3).first();
+            let favorCheck = await db.select('*').from('favor').where('id', 6).first();
             //console.log(favorCheck);
             //let outCheck = await db.select('*').from('outstanding').where('favor_id', 3).first();
             //console.log(outCheck);
@@ -220,7 +220,7 @@ describe.only('Favor Endpoints', function () {
     });
   })
 
-  describe.only('GET /api/favor/friend', () => {
+  describe('GET /api/favor/friend', () => {
     it('gets favors that were posted by friends and only friends', () => {
       let date = new Date(favor[0].expiration_date).toISOString();
       return supertest(app)
@@ -407,6 +407,16 @@ describe.only('Favor Endpoints', function () {
     })
   });
 
-  describe('PATCH api/favor/redeem/:favor_id', () => { });
+  describe('PATCH api/favor/redeem/:favor_id', () => {
+
+    it('does the do', () =>{
+      return supertest(app)
+      .patch('/api/favor/redeem/2')
+      .set('Authorization', helpers.makeAuthHeader(testUsers[1]))
+      .send({outstanding_id: 2})
+      .expect(204)
+
+    })
+   });
 
 });

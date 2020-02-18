@@ -312,7 +312,7 @@ favorRouter
         }
         if (!expiration_date) {
           //TODO: make the expiration later
-          expiration_date = Date.now();
+          expiration_date = new Date();
         }
         if (!publicity) {
           publicity = 'dm';
@@ -334,7 +334,7 @@ favorRouter
           publicity: publicity,
           user_location: user_location,
           limit: limit,
-          posted: null
+          posted: posted
         };
 
         let favorRes = await FavorService.insertFavor(
@@ -350,11 +350,11 @@ favorRouter
           receiver_redeemed: false,
           giver_redeemed: false
         }; //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
-        let outRes = await FavorService.insertOutstanding(
+        let [outRes] = await FavorService.insertOutstanding(
           req.app.get('db'),
           newOutstanding
         );
-        res.status(201).send();
+        res.status(201).send(outRes);
       } catch (error) {
         next(error);
       }
