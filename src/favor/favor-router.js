@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const FavorService = require('./favor-service');
 const FriendService = require('../friend/friend-service');
+const { add } = require('date-fns');
 const {
   requireAuth
 } = require('../middleware/jwt-auth');
@@ -58,14 +59,14 @@ favorRouter
         ) {
           await FavorService.updateOutstanding(
             req.app.get('db'),
-            outstanding.id,
+            outstanding[i].id,
             receiver_id,
             users_id
           );
 
-          const updatedOutstanding = FavorService.getOutstandingById(
+          const updatedOutstanding = await FavorService.getOutstandingById(
             req.app.get('db'),
-            outstanding.id
+            outstanding[i].id
           );
 
           return res
@@ -85,7 +86,7 @@ favorRouter
         outstanding.length < favor.limit
       ) {
         //allow issuing of favor
-        await FavorService.insertOutstanding(
+        let newOutstanding = await FavorService.insertOutstanding(
           db,
           {
             favor_id,
@@ -96,7 +97,9 @@ favorRouter
           }
         );
 
-        return res.status(201).send();
+        return res
+          .status(201)
+          .json(newOutstanding);
       } else {
         return res.status(403).json({
           error:
@@ -160,7 +163,7 @@ favorRouter
       limit,
       page
     );
-   // favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this 
+    // favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -312,7 +315,18 @@ favorRouter
         }
         if (!expiration_date) {
           //TODO: make the expiration later
-          expiration_date = new Date();
+
+          expiration_date = add(
+            Date.now(),
+            {
+              months: 1,
+              days: 1,
+              hours: 1,
+              minutes: 1,
+              seconds: 1
+            }
+          );
+
         }
         if (!publicity) {
           publicity = 'dm';
@@ -354,7 +368,13 @@ favorRouter
           req.app.get('db'),
           newOutstanding
         );
-        res.status(201).send(outRes);
+        res.status(201).location(
+            path.posix.join(
+              req.originalUrl,
+              `/${outRes.favor_id}`
+            )
+          ).json(outRes);
+        
       } catch (error) {
         next(error);
       }
@@ -500,8 +520,17 @@ favorRouter
       //
       //dates must be larger
       if (expiration_date) {
-        if (new Date(expiration_date).toLocaleString() >= new Date(currentFavor.expiration_date).toLocaleString()) {
-          let date = new Date(expiration_date);
+        if (
+          new Date(
+            expiration_date
+          ).toLocaleString() >=
+          new Date(
+            currentFavor.expiration_date
+          ).toLocaleString()
+        ) {
+          let date = new Date(
+            expiration_date
+          );
           newFields = {
             ...newFields,
             expiration_date: date
