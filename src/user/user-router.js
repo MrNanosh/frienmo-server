@@ -106,11 +106,11 @@ userRouter
     })
   })
   //return one user with id: username, name, description, phone#
-  .get('/:id', (req, res) => {
-    const { id } = req.params;
-    UserService.getUserById(
+  .get('/:username', (req, res) => {
+    const { username } = req.params;
+    UserService.getUserByUsername(
       req.app.get('db'),
-      id
+      username
     ).then(result => {
       if (!result) {
         res.status(404).send({
