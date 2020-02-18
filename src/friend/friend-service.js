@@ -1,16 +1,17 @@
 const FriendService = {
     async getFriends(db, user_id) {
-
         //get all the instances in friend table where the user_is is user_id
         const result = await db.select('*').from('friend').where({ user_id })
         //get all the instances in friend table where the friend_id is user_id
         const friends = await db.select('*').from('friend').where('friend_id', user_id)
         let resolution = [];
+        
         //make sure both end consider each other friends
         for (let i = 0; i < result.length; i++) {
             if (result[i].accepted && friends[i].accepted) {
                 //if they are friends add it to the output array
                 resolution.push(result[i]);
+                //console.log("resolution",resolution)
             }
         }
         let answer = [];
@@ -19,8 +20,10 @@ const FriendService = {
             .from('user').where('id', resolution[i].friend_id).first()
                 .then(friend => {
                     answer.push(friend);
+                    console.log("ans",answer)
                 })
         }
+        console.log("return answer",answer)
         return answer;
     },
     makeFriend(db, friend, friend2) {

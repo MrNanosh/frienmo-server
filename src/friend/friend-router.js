@@ -12,6 +12,7 @@ friendRouter
     .get((req, res) => {
         friendService.getFriends(req.app.get('db'), req.user.id)
             .then(result => {
+                console.log("result",result)
                 res.json(result);
             })
     })
