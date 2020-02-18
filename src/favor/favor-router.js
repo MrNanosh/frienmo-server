@@ -237,7 +237,7 @@ favorRouter
         });
       }
 
-      console.log(person, ticket);
+      //console.log(person, ticket);
       if (ticket.users_id === person) {
         if (
           ticket.receiver_redeemed ===
@@ -315,6 +315,7 @@ favorRouter
         }
         if (!expiration_date) {
           //TODO: make the expiration later
+
           expiration_date = add(
             Date.now(),
             {
@@ -325,6 +326,7 @@ favorRouter
               seconds: 1
             }
           );
+
         }
         if (!publicity) {
           publicity = 'dm';
@@ -346,7 +348,7 @@ favorRouter
           publicity: publicity,
           user_location: user_location,
           limit: limit,
-          posted: null
+          posted: posted
         };
 
         let favorRes = await FavorService.insertFavor(
@@ -362,11 +364,17 @@ favorRouter
           receiver_redeemed: false,
           giver_redeemed: false
         }; //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
-        let outRes = await FavorService.insertOutstanding(
+        let [outRes] = await FavorService.insertOutstanding(
           req.app.get('db'),
           newOutstanding
         );
-        res.status(201).send();
+        res.status(201).location(
+            path.posix.join(
+              req.originalUrl,
+              `/${outRes.favor_id}`
+            )
+          ).json(outRes);
+        
       } catch (error) {
         next(error);
       }

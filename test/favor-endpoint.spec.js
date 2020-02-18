@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('Favor Endpoints', function () {
+describe('Favor Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -108,7 +108,7 @@ describe.only('Favor Endpoints', function () {
     describe('POST /api/favor', () => {
       it('it returns 201 and the right information', () => {
         const newFavor = {
-          id: 3,
+          id: 6,
           title: 'newFavor',
           description: 'its news',
           creator_id: 1,
@@ -125,9 +125,9 @@ describe.only('Favor Endpoints', function () {
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .send(newFavor)
           .expect(201)
-          .expect(async () => {
+          .expect(async res => {
             let outCheck
-            let favorCheck = await db.select('*').from('favor').where('id', 3).first();
+            let favorCheck = await db.select('*').from('favor').where('id', 6).first();
             //console.log(favorCheck);
             //let outCheck = await db.select('*').from('outstanding').where('favor_id', 3).first();
             //console.log(outCheck);
@@ -220,7 +220,7 @@ describe.only('Favor Endpoints', function () {
     });
   })
 
-  describe.only('GET /api/favor/friend', () => {
+  describe('GET /api/favor/friend', () => {
     it('gets favors that were posted by friends and only friends', () => {
       let date = new Date(favor[0].expiration_date).toISOString();
       return supertest(app)
@@ -331,29 +331,30 @@ describe.only('Favor Endpoints', function () {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .expect(200)
         .expect({
-          favors: [{
-            favor_id: 3,
-            title: 'title 3',
-            description: 'description 3',
-            category: null,
-            expiration_date: new Date(favor[0].expiration_date).toISOString(),
-            publicity: 'friend',
-            user_location: null,
-            tags: null,
-            limit: 2,
-            outstanding_id: 3,
-            receiver_redeemed: true,
-            issuer_redeemed: true,
-            creator_id: 1,
-            creator_name: 'Test user 1',
-            creator_username: 'test-user-1',
-            issuer_id: 1,
-            issuer_name: 'Test user 1',
-            issuer_username: 'test-user-1',
-            receiver_id: 2,
-            receiver_name: 'Test user 2',
-            receiver_username: 'test-user-2'
-          },
+          favors: [
+            {
+              favor_id: 3,
+              title: 'title 3',
+              description: 'description 3',
+              category: null,
+              expiration_date: new Date(favor[0].expiration_date).toISOString(),
+              publicity: 'friend',
+              user_location: null,
+              tags: null,
+              limit: 2,
+              outstanding_id: 3,
+              receiver_redeemed: true,
+              issuer_redeemed: true,
+              creator_id: 1,
+              creator_name: 'Test user 1',
+              creator_username: 'test-user-1',
+              issuer_id: 1,
+              issuer_name: 'Test user 1',
+              issuer_username: 'test-user-1',
+              receiver_id: 2,
+              receiver_name: 'Test user 2',
+              receiver_username: 'test-user-2'
+            },
           {
             favor_id: 4,
             title: 'title 4',
@@ -376,7 +377,8 @@ describe.only('Favor Endpoints', function () {
             receiver_id: 1,
             receiver_name: 'Test user 1',
             receiver_username: 'test-user-1'
-          }],
+          },
+],
           limit: 30,
           page: 1
         })
@@ -395,7 +397,7 @@ describe.only('Favor Endpoints', function () {
         .set('Authorization', helpers.makeAuthHeader(testUser))
         .send(updatedUsers)
         .expect(201)
-        .expect(async () => {
+        .expect(async res => {
           let test = await db.select('*').from('outstanding').where('id', outstanding[outstanding.length - 1].id + 1).first();
           expect(test).to.have.property('id', 6)
           expect(test).to.have.property('favor_id', updatedUsers.favor_id)
@@ -407,6 +409,16 @@ describe.only('Favor Endpoints', function () {
     })
   });
 
-  describe('PATCH api/favor/redeem/:favor_id', () => { });
+  describe('PATCH api/favor/redeem/:favor_id', () => {
+
+    it('does the do', () =>{
+      return supertest(app)
+      .patch('/api/favor/redeem/2')
+      .set('Authorization', helpers.makeAuthHeader(testUsers[1]))
+      .send({outstanding_id: 2})
+      .expect(204)
+
+    })
+   });
 
 });
