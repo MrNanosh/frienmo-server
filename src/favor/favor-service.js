@@ -5,7 +5,6 @@ const FavorService = {
       .insert(newFavor)
       .into('favor')
       .returning('*');
-    //      .first();
   },
   serializeFavor(favor) {
     return {
@@ -76,15 +75,8 @@ const FavorService = {
         'receiver.name as receiver_name',
         'receiver.username as receiver_username'
       )
-      .limit(productsPerPage)
-      .offset(offset);
   },
   getFavorById(db, id) {
-    // db
-    //   .select('*')
-    //   .from('favor')
-    //   .where('id', id)
-    //   .first(); //excludes personal
 
     return db('outstanding as o')
       .join(
@@ -228,8 +220,6 @@ const FavorService = {
           'o.users_id'
         )
       ])
-      .limit(productsPerPage)
-      .offset(offset);
   },
   getPersonalFavors(
     db,
@@ -258,31 +248,6 @@ const FavorService = {
           '=',
           'dm'
         )
-        // .leftOuterJoin(
-        //   'friend as fr',
-        //   function() {
-        //     this.on(
-        //       'o.users_id',
-        //       '=',
-        //       'fr.user_id'
-        //     ).orOn(
-        //       'fr.friend_id',
-        //       '=',
-        //       'o.receiver_id'
-        //     );
-        //   }
-        // )
-        // .where(function() {
-        //   this.where(
-        //     'fr.user_id',
-        //     '=',
-        //     user_id
-        //   ).orWhere(
-        //     'fr.friend_id',
-        //     '=',
-        //     user_id
-        //   );
-        // })
         .leftOuterJoin(
           'user as receiver',
           'receiver.id',
@@ -335,8 +300,6 @@ const FavorService = {
           'receiver.name as receiver_name',
           'receiver.username as receiver_username'
         )
-        .limit(productsPerPage)
-        .offset(offset)
     );
   },
   updateFavor(db, id, newFavorFields) {
@@ -470,8 +433,6 @@ const FavorService = {
           'receiver.name as receiver_name',
           'receiver.username as receiver_username'
         )
-        .limit(productsPerPage)
-        .offset(offset)
     );
   },
   updateOutstanding(
