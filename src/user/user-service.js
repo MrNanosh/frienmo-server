@@ -50,6 +50,9 @@ const UserService = {
   getUserById(db, id){
     return db.select(['username', 'name', 'phone', 'description']).from('user').where('id', id).first()
   },
+  getUserByUsername(db, username){
+    return db.select(['id','username', 'name']).from('user').where('username', username).first()
+  },
   SearchUsers(db, username){
     return db.select('username', 'name', 'id').from('user')
     .then(result =>{
