@@ -17,6 +17,8 @@ const userRouter = require('./user/user-router');
 
 const favorRouter = require('./favor/favor-router');
 
+const categoryRouter = require('./category-router');
+
 const morganOption =
   NODE_ENV === 'production'
     ? 'tiny'
@@ -34,6 +36,11 @@ app.use('/api/user', userRouter);
 app.use('/api/review', reviewRouter);
 
 app.use('/api/favor', favorRouter);
+
+app.use(
+  '/api/category',
+  categoryRouter
+);
 
 app.use(function errorHandler(
   error,
