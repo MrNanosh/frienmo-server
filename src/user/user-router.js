@@ -120,7 +120,7 @@ userRouter
       res.json(result);
     });
   })
-  .get('/:username', (req, res) => {
+  .get('/username/:username', (req, res) => {
     const { username } = req.params;
     UserService.getUserByUsername(
       req.app.get('db'),
