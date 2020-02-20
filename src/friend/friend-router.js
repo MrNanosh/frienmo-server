@@ -15,14 +15,16 @@ friendRouter
                 console.log("result",result)
                 res.json(result);
             })
-    })
-    //makes a friend request with the user
+    })//makes a friend request with the user
     .post(bodyParser, (req, res) => {
         const { friend_id } = req.body;
+        console.log('friend_id',friend_id)
         if (!friend_id) {
-            res.status(400).send('bad request');
+            res.status(400).send('BAD request');
         }
+
         const id = req.user.id;
+        console.log('my_id',id)
         friend1 = {
             user_id: id,
             friend_id: friend_id,
