@@ -125,6 +125,20 @@ userRouter
       }
       res.json(result);
     });
+  })
+  .get('/username/:username', (req, res) => {
+    const { username } = req.params;
+    UserService.getUserByUsername(
+      req.app.get('db'),
+      username
+    ).then(result => {
+      if (!result) {
+        res.status(404).send({
+          error: 'user not found'
+        });
+      }
+      res.json(result);
+    });
   });
 //TODO: make a route that gets users async with contains
 
