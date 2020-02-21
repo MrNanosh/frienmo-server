@@ -139,7 +139,38 @@ describe.only('Favor Endpoints', function () {
         })
       })
       it('properly filters issued requests', () =>{
-        
+        return supertest(app)
+        .get('/api/favor?filter=issued')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200)
+        .expect(res =>{
+          expect(res.body).to.have.keys('favors', 'page', 'limit');
+          expect(res.body.favors).to.deep.equal([
+            {
+              category: null,
+              creator_id: 1,
+              creator_name: 'Test user 1',
+              creator_username: 'test-user-1',
+              description: 'description 1',
+              expiration_date: new Date(favor[0].expiration_date).toISOString(),
+              id: 1,
+              issuer_id: 1,
+              issuer_name: 'Test user 1',
+              issuer_username: 'test-user-1',
+              limit: favor[0].limit,
+              outstanding_id: 1,
+              posted: null,
+              publicity: 'public',
+              receiver_id: 2,
+              receiver_name: 'Test user 2',
+              receiver_username: 'test-user-2',
+              tags: null,
+              title: 'title 1',
+              user_location: null,
+              issuer_redeemed: true,
+              receiver_redeemed: true
+            }]);
+        })
       })
     });
     describe('POST /api/favor', () => {

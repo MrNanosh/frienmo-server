@@ -459,7 +459,7 @@ const FavorService = {
           result = favors.filter(favor => favor.receiver_id === user.id);
           return result;
         case 'issued':
-          result = favors.filter(favor => favor.user_id === user.id);
+          result = favors.filter(favor => favor.issuer_id === user.id);
           return result;
         case 'redeemed':
           result = favors.filter(favor =>  favor.user_id === user.id && favor.receiver_redeemed)
