@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe('Favor Endpoints', function () {
+describe.only('Favor Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -104,6 +104,43 @@ describe('Favor Endpoints', function () {
             expect(res.body).to.have.property('limit', 30);
           });
       });
+      it('properly filters recieved requests', () =>{
+        return supertest(app)
+        .get('/api/favor?filter=received')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200)
+        .expect(res =>{
+          expect(res.body).to.have.keys('favors', 'page', 'limit');
+          expect(res.body.favors).to.deep.equal([
+            {
+              category: null,
+              creator_id: 2,
+              creator_name: 'Test user 2',
+              creator_username: 'test-user-2',
+              description: 'description 2',
+              expiration_date: null,
+              id: 2,
+              issuer_id: 2,
+              issuer_name: 'Test user 2',
+              issuer_username: 'test-user-2',
+              limit: null,
+              outstanding_id: 2,
+              posted: null,
+              publicity: 'public',
+              receiver_id: 1,
+              receiver_name: 'Test user 1',
+              receiver_username: 'test-user-1',
+              tags: null,
+              title: 'title 2',
+              user_location: null,
+              issuer_redeemed: false,
+              receiver_redeemed: true
+            }]);
+        })
+      })
+      it('properly filters issued requests', () =>{
+        
+      })
     });
     describe('POST /api/favor', () => {
       it('it returns 201 and the right information', () => {

@@ -8,10 +8,12 @@ const {
 } = require('../middleware/jwt-auth');
 const favorRouter = express.Router();
 const jsonBodyParser = express.json();
+const AuthService = require('../Auth/auth-service')
+
 favorRouter
   .route('/')
   .get(async (req, res) => {
-    let { limit, page } = req.query;
+    let { limit, page, filter } = req.query;
     if (!limit) {
       limit = 30;
     }
@@ -23,7 +25,22 @@ favorRouter
       limit,
       page
     );
+    //////////////////// this is req auth but without sending 401s back on failure
+    const authToken = req.get('Authorization') || ''
 
+    let bearerToken
+    if (!authToken.toLowerCase().startsWith('bearer ')) {
+      return res.status(401).json({ error: 'Missing bearer token' })
+    } else {
+      bearerToken = authToken.slice(7, authToken.length)
+    }
+    const payload = AuthService.verifyJwt(bearerToken)
+    const user = await AuthService.getUserWithUserName(
+      req.app.get('db'),
+      payload.sub,
+    )
+    ///////////////
+    favors = FavorService.favorFilter(favors, user, filter);
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -369,12 +386,12 @@ favorRouter
           newOutstanding
         );
         res.status(201).location(
-            path.posix.join(
-              req.originalUrl,
-              `/${outRes.favor_id}`
-            )
-          ).json(outRes);
-        
+          path.posix.join(
+            req.originalUrl,
+            `/${outRes.favor_id}`
+          )
+        ).json(outRes);
+
       } catch (error) {
         next(error);
       }
@@ -410,7 +427,7 @@ favorRouter
       if (
         authuser !== favor.issuer_id ||
         authuser !==
-          favor.receiver_id ||
+        favor.receiver_id ||
         authuser !== favor.creator_id
       ) {
         if (
