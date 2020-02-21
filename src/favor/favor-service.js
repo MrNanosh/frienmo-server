@@ -154,7 +154,7 @@ const FavorService = {
           '=',
           o
         )
-        .where(function() {
+        .where(function () {
           this.where(
             'fr.user_id',
             '=',
@@ -260,7 +260,7 @@ const FavorService = {
           '=',
           'issuer.id'
         )
-        .where(function() {
+        .where(function () {
           this.where(
             'fa.creator_id',
             '=',
@@ -400,11 +400,11 @@ const FavorService = {
     return (
       db('outstanding as o')
         .join('favor as fa', 'fa.id', '=', 'o.favor_id')
-        .join( 'user as creator', 'creator.id', '=', 'fa.creator_id')
-        .where('fa.publicity', '=',  'public')
+        .join('user as creator', 'creator.id', '=', 'fa.creator_id')
+        .where('fa.publicity', '=', 'public')
         .leftOuterJoin('user as receiver', 'receiver.id', '=', 'o.receiver_id')
-        .leftOuterJoin('user as issuer',  'o.users_id', '=', 'issuer.id')
-        .where(function() {
+        .leftOuterJoin('user as issuer', 'o.users_id', '=', 'issuer.id')
+        .where(function () {
           this.where('fa.creator_id', '=', user_id)
             .orWhere('issuer.id', '=', user_id)
             .orWhere('receiver.id', '=', user_id);
@@ -447,6 +447,33 @@ const FavorService = {
         receiver_id,
         users_id
       });
+  },
+  favorFilter(favors, user, filter) {
+    let result;
+    //console.log('asldkfja;lskdfj', favors, filter);
+    if (!filter || !user) {
+      return favors;
+    } else {
+      switch (filter) {
+        case 'received':
+          result = favors.filter(favor => favor.receiver_id === user.id);
+          return result;
+        case 'issued':
+          result = favors.filter(favor => favor.issuer_id === user.id);
+          return result;
+        case 'redeemed':
+          result = favors.filter(favor =>  favor.user_id === user.id && favor.receiver_redeemed)
+          return result;
+        case 'expired':
+          result = favors.filter(favor => new Date(favor.expiration_date).getTime() > Date.now())
+          return result;
+        case 'pending':
+          result = favors.filter(favor => (favor.receiver_redeemed && !favor.issuer_redeemed))
+          return result;
+        default:
+          return favors;
+      }
+    }
   }
 };
 

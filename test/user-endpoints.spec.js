@@ -209,7 +209,7 @@ describe('User Endpoints', function () {
     })
   })
 
-  describe('GET /api/user/search', () =>{
+  describe.skip('GET /api/user/search', () =>{
     beforeEach('insert users', () => helpers.seedUsers(db, testUsers))
     it('returns 200 and users if theyre username exists', () =>{
       let result = []

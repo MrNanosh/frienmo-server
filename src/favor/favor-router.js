@@ -8,10 +8,12 @@ const {
 } = require('../middleware/jwt-auth');
 const favorRouter = express.Router();
 const jsonBodyParser = express.json();
+const AuthService = require('../Auth/auth-service')
+
 favorRouter
   .route('/')
   .get(async (req, res) => {
-    let { limit, page } = req.query;
+    let { limit, page, filter } = req.query;
     if (!limit) {
       limit = 30;
     }
@@ -23,7 +25,22 @@ favorRouter
       limit,
       page
     );
+    //////////////////// this is req auth but without sending 401s back on failure
+    const authToken = req.get('Authorization') || ''
 
+    let bearerToken
+    if (!authToken.toLowerCase().startsWith('bearer ')) {
+      return res.status(401).json({ error: 'Missing bearer token' })
+    } else {
+      bearerToken = authToken.slice(7, authToken.length)
+    }
+    const payload = AuthService.verifyJwt(bearerToken)
+    const user = await AuthService.getUserWithUserName(
+      req.app.get('db'),
+      payload.sub,
+    )
+    ///////////////
+    favors = FavorService.favorFilter(favors, user, filter);
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -114,7 +131,7 @@ favorRouter
     '/personal',
     async (req, res) => {
       let db = req.app.get('db');
-      let { limit, page } = req.query;
+      let { limit, page, filter } = req.query;
       let user_id = req.user.id;
       if (!user_id) {
         return res
@@ -135,6 +152,7 @@ favorRouter
         limit,
         page
       );
+      favors = FavorService.favorFilter(favors, req.user, filter);
       return res
         .status(200)
         .json({ favors, page, limit });
@@ -142,7 +160,7 @@ favorRouter
   )
   .get('/friend', async (req, res) => {
     let db = req.app.get('db');
-    let { limit, page } = req.query;
+    let { limit, page, filter } = req.query;
     let user_id = req.user.id;
     if (!user_id) {
       return res
@@ -163,14 +181,14 @@ favorRouter
       limit,
       page
     );
-    // favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this
+    favors = FavorService.favorFilter(favors, req.user, filter);
     return res
       .status(200)
       .json({ favors, page, limit });
   })
   .get('/public', async (req, res) => {
     let db = req.app.get('db');
-    let { limit, page } = req.query;
+    let { limit, page, filter } = req.query;
     let user_id = req.user.id;
     if (!user_id) {
       return res
@@ -191,6 +209,7 @@ favorRouter
       limit,
       page
     );
+    favors = FavorService.favorFilter(favors, req.user, filter)
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -369,12 +388,12 @@ favorRouter
           newOutstanding
         );
         res.status(201).location(
-            path.posix.join(
-              req.originalUrl,
-              `/${outRes.favor_id}`
-            )
-          ).json(outRes);
-        
+          path.posix.join(
+            req.originalUrl,
+            `/${outRes.favor_id}`
+          )
+        ).json(outRes);
+
       } catch (error) {
         next(error);
       }
@@ -391,7 +410,8 @@ favorRouter
      *or the creator id matches the auth user
      *or any public one
      */
-    const allOutstanding = await FavorService.getFavorById(
+    const {filter} = req.query;
+    let allOutstanding = await FavorService.getFavorById(
       req.app.get('db'),
       req.params.id
     );
@@ -410,7 +430,7 @@ favorRouter
       if (
         authuser !== favor.issuer_id ||
         authuser !==
-          favor.receiver_id ||
+        favor.receiver_id ||
         authuser !== favor.creator_id
       ) {
         if (
@@ -476,6 +496,9 @@ favorRouter
       }
     }
     //TODO: add pagination?
+
+    allOutstanding = FavorService.favorFilter(allOutstanding, req.user, filter);
+    
     return res
       .status(200)
       .json(allOutstanding);
