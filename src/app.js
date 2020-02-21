@@ -19,6 +19,10 @@ const favorRouter = require('./favor/favor-router');
 
 const categoryRouter = require('./category-router');
 
+var corsOptions = {
+  origin: 'http://localhost:3000'
+}
+
 const morganOption =
   NODE_ENV === 'production'
     ? 'tiny'
@@ -26,7 +30,7 @@ const morganOption =
 
 app.use(morgan(morganOption));
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use('/api/auth', authRouter);
 
