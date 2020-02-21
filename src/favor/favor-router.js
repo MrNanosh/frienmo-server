@@ -131,7 +131,7 @@ favorRouter
     '/personal',
     async (req, res) => {
       let db = req.app.get('db');
-      let { limit, page } = req.query;
+      let { limit, page, filter } = req.query;
       let user_id = req.user.id;
       if (!user_id) {
         return res
@@ -152,6 +152,7 @@ favorRouter
         limit,
         page
       );
+      favors = FavorService.favorFilter(favors, req.user, filter);
       return res
         .status(200)
         .json({ favors, page, limit });
@@ -159,7 +160,7 @@ favorRouter
   )
   .get('/friend', async (req, res) => {
     let db = req.app.get('db');
-    let { limit, page } = req.query;
+    let { limit, page, filter } = req.query;
     let user_id = req.user.id;
     if (!user_id) {
       return res
@@ -180,14 +181,14 @@ favorRouter
       limit,
       page
     );
-    // favors = favors.splice(favors.length/2, favors.length-1); //this is a hack, make the service better and remove this
+    favors = FavorService.favorFilter(favors, req.user, filter);
     return res
       .status(200)
       .json({ favors, page, limit });
   })
   .get('/public', async (req, res) => {
     let db = req.app.get('db');
-    let { limit, page } = req.query;
+    let { limit, page, filter } = req.query;
     let user_id = req.user.id;
     if (!user_id) {
       return res
@@ -208,6 +209,7 @@ favorRouter
       limit,
       page
     );
+    favors = FavorService.favorFilter(favors, req.user, filter)
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -408,7 +410,8 @@ favorRouter
      *or the creator id matches the auth user
      *or any public one
      */
-    const allOutstanding = await FavorService.getFavorById(
+    const {filter} = req.query;
+    let allOutstanding = await FavorService.getFavorById(
       req.app.get('db'),
       req.params.id
     );
@@ -493,6 +496,9 @@ favorRouter
       }
     }
     //TODO: add pagination?
+
+    allOutstanding = FavorService.favorFilter(allOutstanding, req.user, filter);
+    
     return res
       .status(200)
       .json(allOutstanding);

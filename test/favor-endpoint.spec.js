@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const app = require('../src/app');
 const helpers = require('./test-helpers');
 
-describe.only('Favor Endpoints', function () {
+describe('Favor Endpoints', function () {
   let db;
 
   const testUsers = helpers.makeUsersArray();
@@ -172,6 +172,16 @@ describe.only('Favor Endpoints', function () {
             }]);
         })
       })
+      it('properly filters redeemed requests', () =>{
+        return supertest(app)
+        .get('/api/favor?filter=redeemed')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200)
+        .expect(res =>{
+          expect(res.body).to.have.keys('favors', 'page', 'limit');
+          expect(res.body.favors).to.deep.equal([])
+        });
+      })
     });
     describe('POST /api/favor', () => {
       it('it returns 201 and the right information', () => {
@@ -209,36 +219,60 @@ describe.only('Favor Endpoints', function () {
 
   describe('/:id route', () => {
     describe('GET /api/favor/:id', () => {
+      const expectedFavor = {
+        category: null,
+        creator_id: 1,
+        creator_name: 'Test user 1',
+        creator_username: 'test-user-1',
+        description: 'description 1',
+        expiration_date: new Date(favor[0].expiration_date).toISOString(),
+        id: 1,
+        issuer_id: 1,
+        issuer_name: 'Test user 1',
+        issuer_username: 'test-user-1',
+        limit: favor[0].limit,
+        outstanding_id: 1,
+        posted: null,
+        publicity: 'public',
+        receiver_id: 2,
+        receiver_name: 'Test user 2',
+        receiver_username: 'test-user-2',
+        tags: null,
+        title: 'title 1',
+        user_location: null,
+        issuer_redeemed: true,
+        receiver_redeemed: true
+      }
       it('returns the specified favor', () => {
-        const expectedFavor = {
-          category: null,
-          creator_id: 1,
-          creator_name: 'Test user 1',
-          creator_username: 'test-user-1',
-          description: 'description 1',
-          expiration_date: new Date(favor[0].expiration_date).toISOString(),
-          id: 1,
-          issuer_id: 1,
-          issuer_name: 'Test user 1',
-          issuer_username: 'test-user-1',
-          limit: favor[0].limit,
-          outstanding_id: 1,
-          posted: null,
-          publicity: 'public',
-          receiver_id: 2,
-          receiver_name: 'Test user 2',
-          receiver_username: 'test-user-2',
-          tags: null,
-          title: 'title 1',
-          user_location: null,
-          issuer_redeemed: true,
-          receiver_redeemed: true
-        }
+        
         return supertest(app)
           .get('/api/favor/1')
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect([expectedFavor])
+      })
+      it('returns an empty array after filtering received', () =>{
+        return supertest(app)
+        .get('/api/favor/1?filter=received')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200)
+        .expect([])
+      })
+      it('returns the expected favor after filtering issued', () =>{
+        return supertest(app)
+        .get('/api/favor/1?filter=issued')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200)
+        .expect([expectedFavor])
+      })
+      it('returns expected favor after filtering redeemed', () =>{
+        it('returns an empty array after filtering received', () =>{
+          return supertest(app)
+          .get('/api/favor/1?filter=received')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect([expectedFavor])
+        })
       })
     });
     describe('PATCH /api/favor/:id', () => {
@@ -479,7 +513,7 @@ describe.only('Favor Endpoints', function () {
 
   describe('PATCH api/favor/redeem/:favor_id', () => {
 
-    it('does the do', () =>{
+    it('updates the favor properly', () =>{
       return supertest(app)
       .patch('/api/favor/redeem/2')
       .set('Authorization', helpers.makeAuthHeader(testUsers[1]))
