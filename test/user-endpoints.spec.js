@@ -222,7 +222,7 @@ describe('User Endpoints', function () {
         result.push(obj);
       }
       return supertest(app)
-      .get('/api/user/search')
+      .post('/api/user/search')
       .send({username: 'test-'})
       .expect(200)
       .expect(result);
