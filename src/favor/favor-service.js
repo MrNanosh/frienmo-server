@@ -464,6 +464,12 @@ const FavorService = {
         case 'redeemed':
           result = favors.filter(favor =>  favor.user_id === user.id && favor.receiver_redeemed)
           return result;
+        case 'expired':
+          result = favors.filter(favor => new Date(favor.expiration_date).getTime() > Date.now())
+          return result;
+        case 'pending':
+          result = favors.filter(favor => (favor.receiver_redeemed && !favor.issuer_redeemed))
+          return result;
         default:
           return favors;
       }
