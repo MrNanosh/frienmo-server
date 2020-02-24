@@ -410,7 +410,7 @@ favorRouter
      *or the creator id matches the auth user
      *or any public one
      */
-    const {filter} = req.query;
+    const { filter } = req.query;
     let allOutstanding = await FavorService.getFavorById(
       req.app.get('db'),
       req.params.id
@@ -498,7 +498,7 @@ favorRouter
     //TODO: add pagination?
 
     allOutstanding = FavorService.favorFilter(allOutstanding, req.user, filter);
-    
+
     return res
       .status(200)
       .json(allOutstanding);
@@ -600,5 +600,23 @@ favorRouter
     );
     return res.status(204).end();
   });
+
+favorRouter
+  .use(requireAuth)
+  .route('/count/:id')
+  .get(async (req, res) => {
+    const { id } = req.params;
+    //get all the outstanding for the favor
+    const outstanding = await FavorService.getOutstanding(req.app.get('db'), id);
+    //get the favor
+    const favor = await FavorService.getFavorById(req.app.get('db'), id);
+    const num = favor[0].limit - outstanding.length;
+    const result = {
+      remaining: num
+    }
+
+    res.json(result);
+  })
+
 
 module.exports = favorRouter;
