@@ -531,7 +531,7 @@ describe('Favor Endpoints', function () {
     })
   });
 
-  describe('PATCH api/favor/redeem/:favor_id', () => {
+  describe.only('PATCH api/favor/redeem/:favor_id', () => {
 
     it('updates the favor properly', () => {
       return supertest(app)

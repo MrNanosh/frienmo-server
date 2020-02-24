@@ -52,11 +52,18 @@ favorRouter
     jsonBodyParser,
     async (req, res) => {
       //TODO: issuer could be anybody tighten validation
+
+
       let {
         favor_id,
         users_id,
         receiver_id
       } = req.body;
+
+      //CHECK make sure this is the right kind of validation
+      if(!(req.user.id === users_id) && !(req.user.id !== receiver_id)){
+        return res.status(403).send({error: 'user isnt involved in this transaction'});
+      }
 
       let db = req.app.get('db');
 
@@ -223,7 +230,9 @@ favorRouter
       const db = req.app.get('db');
       let { outstanding_id } = req.body;
 
-      let confirmation;
+      let confirmation = await FavorService.getFavorById(db, req.params.favor_id);
+
+      console.log(confirmation);
 
       //favor must exist
       let ticket = await FavorService.getOutstanding(
