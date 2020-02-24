@@ -43,54 +43,7 @@ describe('Favor Endpoints', function () {
 
   describe('/ route', () => {
     describe('GET /api/favor', () => {
-      const expectedArr = [{
-        category: null,
-        creator_id: 1,
-        creator_name: 'Test user 1',
-        creator_username: 'test-user-1',
-        description: 'description 1',
-        expiration_date: new Date(favor[0].expiration_date).toISOString(),
-        id: 1,
-        issuer_id: 1,
-        issuer_name: 'Test user 1',
-        issuer_username: 'test-user-1',
-        limit: favor[0].limit,
-        outstanding_id: 1,
-        posted: null,
-        publicity: 'public',
-        receiver_id: 2,
-        receiver_name: 'Test user 2',
-        receiver_username: 'test-user-2',
-        tags: null,
-        title: 'title 1',
-        user_location: null,
-        issuer_redeemed: true,
-        receiver_redeemed: true
-      },
-      {
-        category: null,
-        creator_id: 2,
-        creator_name: 'Test user 2',
-        creator_username: 'test-user-2',
-        description: 'description 2',
-        expiration_date: null,
-        id: 2,
-        issuer_id: 2,
-        issuer_name: 'Test user 2',
-        issuer_username: 'test-user-2',
-        limit: null,
-        outstanding_id: 2,
-        posted: null,
-        publicity: 'public',
-        receiver_id: 1,
-        receiver_name: 'Test user 1',
-        receiver_username: 'test-user-1',
-        tags: null,
-        title: 'title 2',
-        user_location: null,
-        issuer_redeemed: false,
-        receiver_redeemed: true
-      }]
+
       it('it returns all favors marked public for all users', () => {
         return supertest(app)
           .get('/api/favor')
@@ -98,60 +51,156 @@ describe('Favor Endpoints', function () {
           .expect(200)
           .expect(res => {
             expect(res.body).to.have.keys('favors', 'page', 'limit');
-            expect(res.body.favors).to.deep.equal(expectedArr);
+            expect(res.body.favors).to.deep.equal([
+              {
+                category: null,
+                creator_id: 1,
+                creator_name: 'Test user 1',
+                creator_username: 'test-user-1',
+                description: 'description 1',
+                expiration_date: new Date(favor[0].expiration_date).toISOString(),
+                id: 1,
+                issuer_id: 1,
+                issuer_name: 'Test user 1',
+                issuer_username: 'test-user-1',
+                limit: favor[0].limit,
+                outstanding_id: 1,
+                posted: null,
+                publicity: 'public',
+                receiver_id: 2,
+                receiver_name: 'Test user 2',
+                receiver_username: 'test-user-2',
+                tags: null,
+                title: 'title 1',
+                user_location: null,
+                issuer_redeemed: true,
+                receiver_redeemed: true
+              },
+              {
+                category: null,
+                creator_id: 2,
+                creator_name: 'Test user 2',
+                creator_username: 'test-user-2',
+                description: 'description 2',
+                expiration_date: null,
+                id: 2,
+                issuer_id: 2,
+                issuer_name: 'Test user 2',
+                issuer_username: 'test-user-2',
+                limit: null,
+                outstanding_id: 2,
+                posted: null,
+                publicity: 'public',
+                receiver_id: 1,
+                receiver_name: 'Test user 1',
+                receiver_username: 'test-user-1',
+                tags: null,
+                title: 'title 2',
+                user_location: null,
+                issuer_redeemed: false,
+                receiver_redeemed: true
+              }]);
             expect(res.body).to.have.property('page', 1);
             expect(res.body).to.have.property('limit', 30);
           });
       });
-      it('properly filters recieved requests', () =>{
+      it('properly filters recieved requests', () => {
         return supertest(app)
-        .get('/api/favor?filter=received')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect(res =>{
-          expect(res.body).to.have.keys('favors', 'page', 'limit');
-          expect(res.body.favors).to.deep.equal([expectedArr[1]]);
-        })
+          .get('/api/favor?filter=received')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body).to.have.keys('favors', 'page', 'limit');
+            expect(res.body.favors).to.deep.equal([
+              {
+                category: null,
+                creator_id: 2,
+                creator_name: 'Test user 2',
+                creator_username: 'test-user-2',
+                description: 'description 2',
+                expiration_date: null,
+                id: 2,
+                issuer_id: 2,
+                issuer_name: 'Test user 2',
+                issuer_username: 'test-user-2',
+                limit: null,
+                outstanding_id: 2,
+                posted: null,
+                publicity: 'public',
+                receiver_id: 1,
+                receiver_name: 'Test user 1',
+                receiver_username: 'test-user-1',
+                tags: null,
+                title: 'title 2',
+                user_location: null,
+                issuer_redeemed: false,
+                receiver_redeemed: true
+              }]);
+          })
       })
-      it('properly filters issued requests', () =>{
+      it('properly filters issued requests', () => {
         return supertest(app)
-        .get('/api/favor?filter=issued')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect(res =>{
-          expect(res.body).to.have.keys('favors', 'page', 'limit');
-          expect(res.body.favors).to.deep.equal([expectedArr[0]]);
-        })
+          .get('/api/favor?filter=issued')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body).to.have.keys('favors', 'page', 'limit');
+            expect(res.body.favors).to.deep.equal([
+              {
+                category: null,
+                creator_id: 1,
+                creator_name: 'Test user 1',
+                creator_username: 'test-user-1',
+                description: 'description 1',
+                expiration_date: new Date(favor[0].expiration_date).toISOString(),
+                id: 1,
+                issuer_id: 1,
+                issuer_name: 'Test user 1',
+                issuer_username: 'test-user-1',
+                limit: favor[0].limit,
+                outstanding_id: 1,
+                posted: null,
+                publicity: 'public',
+                receiver_id: 2,
+                receiver_name: 'Test user 2',
+                receiver_username: 'test-user-2',
+                tags: null,
+                title: 'title 1',
+                user_location: null,
+                issuer_redeemed: true,
+                receiver_redeemed: true
+              }]);
+          })
       })
-      it('properly filters redeemed requests', () =>{
+      it('properly filters redeemed requests', () => {
         return supertest(app)
-        .get('/api/favor?filter=redeemed')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect(res =>{
-          expect(res.body).to.have.keys('favors', 'page', 'limit');
-          expect(res.body.favors).to.deep.equal([])
-        });
+          .get('/api/favor?filter=redeemed')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body).to.have.keys('favors', 'page', 'limit');
+            expect(res.body.favors).to.deep.equal([])
+          });
       })
-      it('properly filters expired requests', () =>{
+      it('properly filters expired requests', () => {
         return supertest(app)
-        .get('/api/favor?filter=expired')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect(res =>{
-          expect(res.body).to.have.keys('favors', 'page', 'limit');
-          expect(res.body.favors).to.deep.equal([])
-        });
+          .get('/api/favor?filter=expired')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body).to.have.keys('favors', 'page', 'limit');
+            expect(res.body.favors).to.deep.equal([])
+          });
       })
-      it('properly filters pending requests', () =>{
+      it('properly filters pendingrequests', () => {
         return supertest(app)
-        .get('/api/favor?filter=pending')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect(res =>{
-          expect(res.body).to.have.keys('favors', 'page', 'limit');
-          expect(res.body.favors).to.deep.equal([expectedArr[1]])
-        });
+          .get('/api/favor?filter=expired')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
+          .expect(res => {
+            expect(res.body).to.have.keys('favors', 'page', 'limit');
+            expect(res.body.favors).to.deep.equal([])
+          });
       })
     });
     describe('POST /api/favor', () => {
@@ -215,34 +264,34 @@ describe('Favor Endpoints', function () {
         receiver_redeemed: true
       }
       it('returns the specified favor', () => {
-        
+
         return supertest(app)
           .get('/api/favor/1')
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
           .expect([expectedFavor])
       })
-      it('returns an empty array after filtering received', () =>{
+      it('returns an empty array after filtering received', () => {
         return supertest(app)
-        .get('/api/favor/1?filter=received')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect([])
-      })
-      it('returns the expected favor after filtering issued', () =>{
-        return supertest(app)
-        .get('/api/favor/1?filter=issued')
-        .set('Authorization', helpers.makeAuthHeader(testUser))
-        .expect(200)
-        .expect([expectedFavor])
-      })
-      it('returns expected favor after filtering redeemed', () =>{
-        it('returns an empty array after filtering received', () =>{
-          return supertest(app)
           .get('/api/favor/1?filter=received')
           .set('Authorization', helpers.makeAuthHeader(testUser))
           .expect(200)
+          .expect([])
+      })
+      it('returns the expected favor after filtering issued', () => {
+        return supertest(app)
+          .get('/api/favor/1?filter=issued')
+          .set('Authorization', helpers.makeAuthHeader(testUser))
+          .expect(200)
           .expect([expectedFavor])
+      })
+      it('returns expected favor after filtering redeemed', () => {
+        it('returns an empty array after filtering received', () => {
+          return supertest(app)
+            .get('/api/favor/1?filter=received')
+            .set('Authorization', helpers.makeAuthHeader(testUser))
+            .expect(200)
+            .expect([expectedFavor])
         })
       })
     });
@@ -352,7 +401,7 @@ describe('Favor Endpoints', function () {
               receiver_id: 1,
               receiver_name: 'Test user 1',
               receiver_username: 'test-user-1'
-            }            
+            }
           ],
           limit: 30,
           page: 1
@@ -428,30 +477,30 @@ describe('Favor Endpoints', function () {
               receiver_name: 'Test user 2',
               receiver_username: 'test-user-2'
             },
-          {
-            favor_id: 4,
-            title: 'title 4',
-            description: 'description 4',
-            category: null,
-            expiration_date: null,
-            publicity: 'friend',
-            user_location: null,
-            tags: null,
-            limit: null,
-            outstanding_id: 4,
-            receiver_redeemed: true,
-            issuer_redeemed: false,
-            creator_id: 2,
-            creator_name: 'Test user 2',
-            creator_username: 'test-user-2',
-            issuer_id: 2,
-            issuer_name: 'Test user 2',
-            issuer_username: 'test-user-2',
-            receiver_id: 1,
-            receiver_name: 'Test user 1',
-            receiver_username: 'test-user-1'
-          },
-],
+            {
+              favor_id: 4,
+              title: 'title 4',
+              description: 'description 4',
+              category: null,
+              expiration_date: null,
+              publicity: 'friend',
+              user_location: null,
+              tags: null,
+              limit: null,
+              outstanding_id: 4,
+              receiver_redeemed: true,
+              issuer_redeemed: false,
+              creator_id: 2,
+              creator_name: 'Test user 2',
+              creator_username: 'test-user-2',
+              issuer_id: 2,
+              issuer_name: 'Test user 2',
+              issuer_username: 'test-user-2',
+              receiver_id: 1,
+              receiver_name: 'Test user 1',
+              receiver_username: 'test-user-1'
+            },
+          ],
           limit: 30,
           page: 1
         })
@@ -484,14 +533,24 @@ describe('Favor Endpoints', function () {
 
   describe('PATCH api/favor/redeem/:favor_id', () => {
 
-    it('updates the favor properly', () =>{
+    it('updates the favor properly', () => {
       return supertest(app)
-      .patch('/api/favor/redeem/2')
-      .set('Authorization', helpers.makeAuthHeader(testUsers[1]))
-      .send({outstanding_id: 2})
-      .expect(204)
+        .patch('/api/favor/redeem/2')
+        .set('Authorization', helpers.makeAuthHeader(testUsers[1]))
+        .send({ outstanding_id: 2 })
+        .expect(204)
 
     })
-   });
+  });
+
+  describe('GET api/favor/count/:id', () => {
+    it('returns the right number', () => {
+      return supertest(app)
+        .get('/api/favor/count/1')
+        .set('Authorization', helpers.makeAuthHeader(testUser))
+        .expect(200)
+        .expect({ remaining: 1 })
+    })
+  })
 
 });
