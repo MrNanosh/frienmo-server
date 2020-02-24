@@ -61,7 +61,7 @@ favorRouter
       } = req.body;
 
       //CHECK make sure this is the right kind of validation
-      if(!(req.user.id !== users_id) && !(req.user.id !== receiver_id)){
+      if((req.user.id !== users_id) && (req.user.id !== receiver_id)){
         return res.status(403).send({error: 'user isnt involved in this transaction'});
       }
 
