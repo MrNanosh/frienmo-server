@@ -82,7 +82,7 @@ describe('Favor Endpoints', function () {
                 creator_name: 'Test user 2',
                 creator_username: 'test-user-2',
                 description: 'description 2',
-                expiration_date: null,
+                expiration_date: new Date(favor[1].expiration_date).toISOString(),
                 id: 2,
                 issuer_id: 2,
                 issuer_name: 'Test user 2',
@@ -118,7 +118,7 @@ describe('Favor Endpoints', function () {
                 creator_name: 'Test user 2',
                 creator_username: 'test-user-2',
                 description: 'description 2',
-                expiration_date: null,
+                expiration_date: new Date(favor[1].expiration_date).toISOString(),
                 id: 2,
                 issuer_id: 2,
                 issuer_name: 'Test user 2',
@@ -189,7 +189,30 @@ describe('Favor Endpoints', function () {
           .expect(200)
           .expect(res => {
             expect(res.body).to.have.keys('favors', 'page', 'limit');
-            expect(res.body.favors).to.deep.equal([])
+            expect(res.body.favors).to.deep.equal([{
+              category: null,
+              creator_id: 2,
+              creator_name: 'Test user 2',
+              creator_username: 'test-user-2',
+              description: 'description 2',
+              expiration_date: new Date(favor[1].expiration_date).toISOString(),
+              id: 2,
+              issuer_id: 2,
+              issuer_name: 'Test user 2',
+              issuer_username: 'test-user-2',
+              limit: null,
+              outstanding_id: 2,
+              posted: null,
+              publicity: 'public',
+              receiver_id: 1,
+              receiver_name: 'Test user 1',
+              receiver_username: 'test-user-1',
+              tags: null,
+              title: 'title 2',
+              user_location: null,
+              issuer_redeemed: false,
+              receiver_redeemed: true
+            }])
           });
       })
       it('properly filters pendingrequests', () => {
@@ -199,7 +222,30 @@ describe('Favor Endpoints', function () {
           .expect(200)
           .expect(res => {
             expect(res.body).to.have.keys('favors', 'page', 'limit');
-            expect(res.body.favors).to.deep.equal([])
+            expect(res.body.favors).to.deep.equal([{
+              category: null,
+              creator_id: 2,
+              creator_name: 'Test user 2',
+              creator_username: 'test-user-2',
+              description: 'description 2',
+              expiration_date: new Date(favor[1].expiration_date).toISOString(),
+              id: 2,
+              issuer_id: 2,
+              issuer_name: 'Test user 2',
+              issuer_username: 'test-user-2',
+              limit: null,
+              outstanding_id: 2,
+              posted: null,
+              publicity: 'public',
+              receiver_id: 1,
+              receiver_name: 'Test user 1',
+              receiver_username: 'test-user-1',
+              tags: null,
+              title: 'title 2',
+              user_location: null,
+              issuer_redeemed: false,
+              receiver_redeemed: true
+            }])
           });
       })
     });
@@ -407,8 +453,7 @@ describe('Favor Endpoints', function () {
           page: 1
         });
     })
-  }); //returns each favor correctly, but twice, I assume its an issue with the join method but not sure how to fix
-  //update: i think i fixed it but check with Dana to make sure it works right 
+  }); 
 
   describe('GET /api/favor/personal', () => {
     it('gets favors with the publicity of dm', () => {
@@ -531,7 +576,7 @@ describe('Favor Endpoints', function () {
     })
   });
 
-  describe.only('PATCH api/favor/redeem/:favor_id', () => {
+  describe('PATCH api/favor/redeem/:favor_id', () => {
 
     it('updates the favor properly', () => {
       return supertest(app)

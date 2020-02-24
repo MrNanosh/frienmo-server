@@ -61,7 +61,7 @@ favorRouter
       } = req.body;
 
       //CHECK make sure this is the right kind of validation
-      if(!(req.user.id === users_id) && !(req.user.id !== receiver_id)){
+      if(!(req.user.id !== users_id) && !(req.user.id !== receiver_id)){
         return res.status(403).send({error: 'user isnt involved in this transaction'});
       }
 
@@ -232,7 +232,7 @@ favorRouter
 
       let confirmation = await FavorService.getFavorById(db, req.params.favor_id);
 
-
+      console.log(confirmation[0].expiration_date.toLocaleString(), new Date().toLocaleString())
       if(confirmation[0].expiration_date.toLocaleString() < new Date().toLocaleString()){
         return res.status(401).send({error: 'favor has expired'});
       }
@@ -348,7 +348,7 @@ favorRouter
           category = 1;
         }
         if (!expiration_date) {
-          //TODO: make the expiration later
+          //TODO: make sure the expiration is a later date
 
           expiration_date = add(
             Date.now(),
