@@ -232,7 +232,13 @@ favorRouter
 
       let confirmation = await FavorService.getFavorById(db, req.params.favor_id);
 
-      console.log(confirmation);
+
+      if(confirmation[0].expiration_date.toLocaleString() < new Date().toLocaleString()){
+        return res.status(401).send({error: 'favor has expired'});
+      }
+
+     // new Date(expiration_date).toLocaleString()
+     // new Date(currentFavor.expiration_date).toLocaleString()
 
       //favor must exist
       let ticket = await FavorService.getOutstanding(

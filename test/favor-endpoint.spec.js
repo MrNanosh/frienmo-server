@@ -539,7 +539,6 @@ describe('Favor Endpoints', function () {
         .set('Authorization', helpers.makeAuthHeader(testUsers[1]))
         .send({ outstanding_id: 2 })
         .expect(204)
-
     })
   });
 
