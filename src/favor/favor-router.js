@@ -181,6 +181,7 @@ favorRouter
       limit,
       page
     );
+    favors = FavorService.favorFilter(favors, req.user, 'expired');
     favors = FavorService.favorFilter(favors, req.user, filter);
     return res
       .status(200)
@@ -209,6 +210,7 @@ favorRouter
       limit,
       page
     );
+    favors = FavorService.favorFilter(favors, req.user, 'expired');
     favors = FavorService.favorFilter(favors, req.user, filter)
     return res
       .status(200)
