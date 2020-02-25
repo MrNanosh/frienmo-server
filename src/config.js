@@ -1,7 +1,4 @@
-export default {
-  TOKEN_KEY: process.env.REACT_APP_TOKEN_KEY,
-  API_ENDPOINT: process.env.REACT_APP_API_ENDPOINT,
-  SKIP_PREFLIGHT_CHECK: process.env.REACT_APP_PREFLIGHT_CHECK,
+module.exports = {
   PORT: process.env.PORT || 8000,
   NODE_ENV:
     process.env.NODE_ENV ||
