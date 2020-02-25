@@ -123,7 +123,7 @@ function makeUsersAndFavors() {
       description: 'description 3',
       publicity: 'friend',
       creator_id: 1,
-      expiration_date: new Date(),
+      expiration_date: new Date(Date.now() + 100000),
       limit: 2
     },
     {

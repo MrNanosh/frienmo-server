@@ -450,7 +450,6 @@ const FavorService = {
   },
   favorFilter(favors, user, filter) {
     let result;
-    //console.log('asldkfja;lskdfj', favors, filter);
     if (!filter || !user) {
       return favors;
     } else {
@@ -476,8 +475,8 @@ const FavorService = {
     }
   },
   filterOtherExpired(favors, user) {
-    let result = favors.filter(favor => (favor.issuer_id === user.id || favor.receiver_id === user.id)
-     && new Date(favor.expiration_date).getTime() > Date.now())
+    let result = favors.filter(favor =>(favor.issuer_id === user.id || favor.receiver_id === user.id) 
+      && new Date(favor.expiration_date).getTime() > Date.now());
     return result;
   }
 };

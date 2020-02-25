@@ -41,33 +41,35 @@ const UserService = {
       username: user.username,
     }
   },
-  getAllUsers(db){
+  getAllUsers(db) {
     return db.select(['username', 'name', 'id']).from('user')
-      .then(res =>{
+      .then(res => {
         return res;
       })
   },
-  getUserById(db, id){
+  getUserById(db, id) {
     return db.select(['username', 'name', 'phone', 'description']).from('user').where('id', id).first()
   },
-  getUserByUsername(db, username){
-    return db.select(['id','username', 'name']).from('user').where('username', username).first()
+  getUserByUsername(db, username) {
+    return db.select(['id', 'username', 'name']).from('user').where('username', username).first()
   },
-  SearchUsers(db, username){
+  SearchUsers(db, username) { //TODO: not return yourself
     return db.select('username', 'name', 'id').from('user')
-    .then(result =>{
-      res = []
-      count = 1;
-      for(let i = 0; i< result.length; i++){
-        if(count < 10){
-          if(result[i].username.includes(username)){
-            res.push(result[i]);
-            count++
+      .then(result => {
+        res = []
+        count = 1;
+        for (let i = 0; i < result.length; i++) {
+          if (count < 10) {
+            if (result[i].username.includes(username)) {
+              if (username !== result[i].username) {
+                res.push(result[i]);
+                count++
+              }
+            }
           }
         }
-      }
-      return res;
-    })
+        return res;
+      })
   }
 }
 
