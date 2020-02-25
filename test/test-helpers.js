@@ -114,6 +114,7 @@ function makeUsersAndFavors() {
       title: 'title 2',
       description: 'description 2',
       publicity: 'public',
+      expiration_date: new Date(Date.now() + 100000),
       creator_id: 2
     },
     {

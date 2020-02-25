@@ -21,7 +21,7 @@ friendRouter
       });
   })
   //makes a friend request with the user
-  .post(bodyParser, (req, res) => {
+  .post(bodyParser, async (req, res) => {
     const { friend_id } = req.body;
     if (!friend_id) {
       res
@@ -29,6 +29,25 @@ friendRouter
         .send('bad request');
     }
     //TODO: needs to check to see if there is already an outstandin request and do an update instead
+    const existing = await friendService.getFriendRequestById(req.app.get('db'), req.user.id, friend_id);
+    if(!!existing){
+      if (confirm.accepted) {
+        return res
+          .status(400)
+          .send({
+            error:
+              'you are already friends'
+          });
+      }
+      const acceptance = await friendService.confirmFriend(
+        req.app.get('db'),
+        req.user.id,
+        friend_id
+      );
+      return res
+        .status(201)
+        .send(acceptance[0]);
+    } else {
     const id = req.user.id;
     friend1 = {
       user_id: id,
@@ -49,6 +68,7 @@ friendRouter
       .then(friend => {
         res.status(201).send(friend);
       });
+    }
   });
 
 friendRouter
@@ -72,7 +92,7 @@ friendRouter
   .patch(async (req, res) => {
     let friend_id = req.params;
     friend_id = parseInt(friend_id.id);
-    //TODO: needs to only allow the auth user to do this
+
     let confirm = await friendService.getFriendRequestById(
       req.app.get('db'),
       req.user.id,
