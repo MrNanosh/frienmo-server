@@ -128,10 +128,10 @@ favorRouter
               favor.outstanding_id ===
               updatedOutstanding.id
           );
+
           return res
-            .status(204)
-            .json(newFavor);
-          // 204 is appropriate for this case
+            .status(201)
+            .json(updatedOutstanding);
         }
       }
 
@@ -167,6 +167,11 @@ favorRouter
             newOutstanding[0].id
         );
 
+        console.log(
+          newFavor,
+          newOutstanding,
+          'hello'
+        );
         return res
           .status(201)
           .json(newFavor);
@@ -492,6 +497,7 @@ favorRouter
           req.app.get('db'),
           newOutstanding
         );
+        console.log(outRes);
         res
           .status(201)
           .location(

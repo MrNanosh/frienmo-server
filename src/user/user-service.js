@@ -1,76 +1,122 @@
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
 
-const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/
+const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
 const UserService = {
   hasUserWithUserName(db, username) {
     return db('user')
       .where({ username })
       .first()
-      .then(user => !!user)
+      .then(user => !!user);
   },
   insertUser(db, newUser) {
     return db
       .insert(newUser)
       .into('user')
       .returning('*')
-      .then(([user]) => user)
+      .then(([user]) => user);
   },
   validatePassword(password) {
     if (password.length < 8) {
-      return 'Password be longer than 8 characters'
+      return 'Password be longer than 8 characters';
     }
     if (password.length > 72) {
-      return 'Password be less than 72 characters'
+      return 'Password be less than 72 characters';
     }
-    if (password.startsWith(' ') || password.endsWith(' ')) {
-      return 'Password must not start or end with empty spaces'
+    if (
+      password.startsWith(' ') ||
+      password.endsWith(' ')
+    ) {
+      return 'Password must not start or end with empty spaces';
     }
-    if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
-      return 'Password must contain one upper case, lower case, number and special character'
+    if (
+      !REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(
+        password
+      )
+    ) {
+      return 'Password must contain one upper case, lower case, number and special character';
     }
-    return null
+    return null;
   },
   hashPassword(password) {
-    return bcrypt.hash(password, 12)
+    return bcrypt.hash(password, 12);
   },
   serializeUser(user) {
     return {
       id: user.id,
       name: user.name,
-      username: user.username,
-    }
+      username: user.username
+    };
   },
   getAllUsers(db) {
-    return db.select(['username', 'name', 'id']).from('user')
+    return db
+      .select([
+        'username',
+        'name',
+        'id'
+      ])
+      .from('user')
       .then(res => {
         return res;
-      })
+      });
   },
   getUserById(db, id) {
-    return db.select(['username', 'name', 'phone', 'description']).from('user').where('id', id).first()
+    return db
+      .select([
+        'username',
+        'name',
+        'phone',
+        'description'
+      ])
+      .from('user')
+      .where('id', id)
+      .first();
   },
   getUserByUsername(db, username) {
-    return db.select(['id', 'username', 'name']).from('user').where('username', username).first()
+    return db
+      .select([
+        'id',
+        'username',
+        'name'
+      ])
+      .from('user')
+      .where('username', username)
+      .first();
   },
-  SearchUsers(db, username) { //TODO: not return yourself
-    return db.select('username', 'name', 'id').from('user')
+  SearchUsers(db, username, user) {
+    //TODO: not return yourself
+    return db
+      .select('username', 'name', 'id')
+      .from('user')
       .then(result => {
-        res = []
+        res = [];
         count = 1;
-        for (let i = 0; i < result.length; i++) {
+        for (
+          let i = 0;
+          i < result.length;
+          i++
+        ) {
           if (count < 10) {
-            if (result[i].username.includes(username)) {
-              if (username !== result[i].username) {
+            if (
+              result[
+                i
+              ].username.includes(
+                username
+              )
+            ) {
+              if (
+                user.username !==
+                result[i].username
+              ) {
                 res.push(result[i]);
-                count++
+                count++;
               }
             }
           }
         }
         return res;
-      })
+      });
   }
-}
+};
 
-module.exports = UserService
+module.exports = UserService;

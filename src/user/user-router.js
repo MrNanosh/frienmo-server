@@ -4,6 +4,9 @@ const UserService = require('./user-service');
 
 const userRouter = express.Router();
 const jsonBodyParser = express.json();
+const {
+  requireAuth
+} = require('../middleware/jwt-auth');
 
 userRouter
   .post(
@@ -96,8 +99,10 @@ userRouter
     ).then(result => {
       res.json(result);
     });
-  })
-  //returns a list of strings with a limit of 10 who's username starts with the input string
+  });
+//returns a list of strings with a limit of 10 who's username starts with the input string
+userRouter
+  .use(requireAuth)
   .post(
     '/search',
     jsonBodyParser,
@@ -105,13 +110,16 @@ userRouter
       let { username } = req.body;
       UserService.SearchUsers(
         req.app.get('db'),
-        username
+        username,
+        req.user
       ).then(result => {
         res.json(result);
       });
     }
-  )
-  //return one user with id: username, name, description, phone#
+  );
+
+//return one user with id: username, name, description, phone#
+userRouter
   .get('/:id', (req, res) => {
     const { id } = req.params;
     UserService.getUserById(
@@ -126,20 +134,22 @@ userRouter
       res.json(result);
     });
   })
-  .get('/username/:username', (req, res) => {
-    const { username } = req.params;
-    UserService.getUserByUsername(
-      req.app.get('db'),
-      username
-    ).then(result => {
-      if (!result) {
-        res.status(404).send({
-          error: 'user not found'
-        });
-      }
-      res.json(result);
-    });
-  });
-
+  .get(
+    '/username/:username',
+    (req, res) => {
+      const { username } = req.params;
+      UserService.getUserByUsername(
+        req.app.get('db'),
+        username
+      ).then(result => {
+        if (!result) {
+          res.status(404).send({
+            error: 'user not found'
+          });
+        }
+        res.json(result);
+      });
+    }
+  );
 
 module.exports = userRouter;
