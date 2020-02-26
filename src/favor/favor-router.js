@@ -118,9 +118,19 @@ favorRouter
             outstanding[i].id
           );
 
+          let newFavor = await FavorService.getFavorById(
+            db,
+            favor_id
+          );
+
+          newFavor = newFavor.find(
+            favor =>
+              favor.outstanding_id ===
+              updatedOutstanding.id
+          );
           return res
             .status(204)
-            .json(updatedOutstanding);
+            .json(newFavor);
           // 204 is appropriate for this case
         }
       }
@@ -146,9 +156,20 @@ favorRouter
           }
         );
 
+        let newFavor = await FavorService.getFavorById(
+          db,
+          favor_id
+        );
+
+        newFavor = newFavor.find(
+          favor =>
+            favor.outstanding_id ===
+            newOutstanding[0].id
+        );
+
         return res
           .status(201)
-          .json(newOutstanding);
+          .json(newFavor);
       } else {
         return res.status(403).json({
           error:
