@@ -8,12 +8,16 @@ const {
 } = require('../middleware/jwt-auth');
 const favorRouter = express.Router();
 const jsonBodyParser = express.json();
-const AuthService = require('../Auth/auth-service')
+const AuthService = require('../Auth/auth-service');
 
 favorRouter
   .route('/')
   .get(async (req, res) => {
-    let { limit, page, filter } = req.query;
+    let {
+      limit,
+      page,
+      filter
+    } = req.query;
     if (!limit) {
       limit = 30;
     }
@@ -26,21 +30,37 @@ favorRouter
       page
     );
     //////////////////// this is req auth but without sending 401s back on failure
-    const authToken = req.get('Authorization') || ''
+    const authToken =
+      req.get('Authorization') || '';
 
-    let bearerToken
-    if (!authToken.toLowerCase().startsWith('bearer ')) {
-      return res.status(401).json({ error: 'Missing bearer token' })
+    let bearerToken;
+    if (
+      !authToken
+        .toLowerCase()
+        .startsWith('bearer ')
+    ) {
+      return res.status(401).json({
+        error: 'Missing bearer token'
+      });
     } else {
-      bearerToken = authToken.slice(7, authToken.length)
+      bearerToken = authToken.slice(
+        7,
+        authToken.length
+      );
     }
-    const payload = AuthService.verifyJwt(bearerToken)
+    const payload = AuthService.verifyJwt(
+      bearerToken
+    );
     const user = await AuthService.getUserWithUserName(
       req.app.get('db'),
-      payload.sub,
-    )
+      payload.sub
+    );
     ///////////////
-    favors = FavorService.favorFilter(favors, user, filter);
+    favors = FavorService.favorFilter(
+      favors,
+      user,
+      filter
+    );
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -53,7 +73,6 @@ favorRouter
     async (req, res) => {
       //TODO: issuer could be anybody tighten validation
 
-
       let {
         favor_id,
         users_id,
@@ -61,8 +80,14 @@ favorRouter
       } = req.body;
 
       //CHECK make sure this is the right kind of validation
-      if((req.user.id !== users_id) && (req.user.id !== receiver_id)){
-        return res.status(403).send({error: 'user isnt involved in this transaction'});
+      if (
+        !(req.user.id !== users_id) &&
+        !(req.user.id !== receiver_id)
+      ) {
+        return res.status(403).send({
+          error:
+            'user isnt involved in this transaction'
+        });
       }
 
       let db = req.app.get('db');
@@ -138,7 +163,11 @@ favorRouter
     '/personal',
     async (req, res) => {
       let db = req.app.get('db');
-      let { limit, page, filter } = req.query;
+      let {
+        limit,
+        page,
+        filter
+      } = req.query;
       let user_id = req.user.id;
       if (!user_id) {
         return res
@@ -159,7 +188,11 @@ favorRouter
         limit,
         page
       );
-      favors = FavorService.favorFilter(favors, req.user, filter);
+      favors = FavorService.favorFilter(
+        favors,
+        req.user,
+        filter
+      );
       return res
         .status(200)
         .json({ favors, page, limit });
@@ -167,7 +200,11 @@ favorRouter
   )
   .get('/friend', async (req, res) => {
     let db = req.app.get('db');
-    let { limit, page, filter } = req.query;
+    let {
+      limit,
+      page,
+      filter
+    } = req.query;
     let user_id = req.user.id;
     if (!user_id) {
       return res
@@ -188,15 +225,26 @@ favorRouter
       limit,
       page
     );
-    favors = FavorService.filterOtherExpired(favors, req.user);
-    favors = FavorService.favorFilter(favors, req.user, filter);
+    favors = FavorService.filterOtherExpired(
+      favors,
+      req.user
+    );
+    favors = FavorService.favorFilter(
+      favors,
+      req.user,
+      filter
+    );
     return res
       .status(200)
       .json({ favors, page, limit });
   })
   .get('/public', async (req, res) => {
     let db = req.app.get('db');
-    let { limit, page, filter } = req.query;
+    let {
+      limit,
+      page,
+      filter
+    } = req.query;
     let user_id = req.user.id;
     if (!user_id) {
       return res
@@ -217,8 +265,15 @@ favorRouter
       limit,
       page
     );
-    favors = FavorService.filterOtherExpired(favors, req.user);
-    favors = FavorService.favorFilter(favors, req.user, filter)
+    favors = FavorService.filterOtherExpired(
+      favors,
+      req.user
+    );
+    favors = FavorService.favorFilter(
+      favors,
+      req.user,
+      filter
+    );
     return res
       .status(200)
       .json({ favors, page, limit });
@@ -232,15 +287,26 @@ favorRouter
       const db = req.app.get('db');
       let { outstanding_id } = req.body;
 
-      let confirmation = await FavorService.getFavorById(db, req.params.favor_id);
+      let confirmation = await FavorService.getFavorById(
+        db,
+        req.params.favor_id
+      );
 
-      console.log(confirmation[0].expiration_date.toLocaleString(), new Date().toLocaleString())
-      if(confirmation[0].expiration_date.toLocaleString() < new Date().toLocaleString()){
-        return res.status(401).send({error: 'favor has expired'});
+      console.log(
+        confirmation[0].expiration_date.toLocaleString(),
+        new Date().toLocaleString()
+      );
+      if (
+        confirmation[0].expiration_date.toLocaleString() <
+        new Date().toLocaleString()
+      ) {
+        return res.status(401).send({
+          error: 'favor has expired'
+        });
       }
 
-     // new Date(expiration_date).toLocaleString()
-     // new Date(currentFavor.expiration_date).toLocaleString()
+      // new Date(expiration_date).toLocaleString()
+      // new Date(currentFavor.expiration_date).toLocaleString()
 
       //favor must exist
       let ticket = await FavorService.getOutstanding(
@@ -362,7 +428,6 @@ favorRouter
               seconds: 1
             }
           );
-
         }
         if (!publicity) {
           publicity = 'dm';
@@ -400,17 +465,21 @@ favorRouter
           receiver_redeemed: false,
           giver_redeemed: false
         }; //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
-        let [outRes] = await FavorService.insertOutstanding(
+        let [
+          outRes
+        ] = await FavorService.insertOutstanding(
           req.app.get('db'),
           newOutstanding
         );
-        res.status(201).location(
-          path.posix.join(
-            req.originalUrl,
-            `/${outRes.favor_id}`
+        res
+          .status(201)
+          .location(
+            path.posix.join(
+              req.originalUrl,
+              `/${outRes.favor_id}`
+            )
           )
-        ).json(outRes);
-
+          .json(outRes);
       } catch (error) {
         next(error);
       }
@@ -447,7 +516,7 @@ favorRouter
       if (
         authuser !== favor.issuer_id ||
         authuser !==
-        favor.receiver_id ||
+          favor.receiver_id ||
         authuser !== favor.creator_id
       ) {
         if (
@@ -514,7 +583,11 @@ favorRouter
     }
     //TODO: add pagination?
 
-    allOutstanding = FavorService.favorFilter(allOutstanding, req.user, filter);
+    allOutstanding = FavorService.favorFilter(
+      allOutstanding,
+      req.user,
+      filter
+    );
 
     return res
       .status(200)
@@ -624,16 +697,23 @@ favorRouter
   .get(async (req, res) => {
     const { id } = req.params;
     //get all the outstanding for the favor
-    const outstanding = await FavorService.getOutstanding(req.app.get('db'), id);
+    const outstanding = await FavorService.getOutstanding(
+      req.app.get('db'),
+      id
+    );
     //get the favor
-    const favor = await FavorService.getFavorById(req.app.get('db'), id);
-    const num = favor[0].limit - outstanding.length;
+    const favor = await FavorService.getFavorById(
+      req.app.get('db'),
+      id
+    );
+    const num =
+      favor[0].limit -
+      outstanding.length;
     const result = {
       remaining: num
-    }
+    };
 
     res.json(result);
-  })
-
+  });
 
 module.exports = favorRouter;
