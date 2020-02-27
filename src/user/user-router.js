@@ -100,23 +100,6 @@ userRouter
       res.json(result);
     });
   });
-//returns a list of strings with a limit of 10 who's username starts with the input string
-userRouter
-  .use(requireAuth)
-  .post(
-    '/search',
-    jsonBodyParser,
-    (req, res) => {
-      let { username } = req.body;
-      UserService.SearchUsers(
-        req.app.get('db'),
-        username,
-        req.user
-      ).then(result => {
-        res.json(result);
-      });
-    }
-  );
 
 //return one user with id: username, name, description, phone#
 userRouter
@@ -147,6 +130,24 @@ userRouter
             error: 'user not found'
           });
         }
+        res.json(result);
+      });
+    }
+  );
+
+//returns a list of strings with a limit of 10 who's username starts with the input string
+userRouter
+  .use(requireAuth)
+  .post(
+    '/search',
+    jsonBodyParser,
+    (req, res) => {
+      let { username } = req.body;
+      UserService.SearchUsers(
+        req.app.get('db'),
+        username,
+        req.user
+      ).then(result => {
         res.json(result);
       });
     }
