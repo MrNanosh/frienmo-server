@@ -273,6 +273,12 @@ oustanding giver_redeemed as issuer_redeemed, creator id,
 creator name, creator username, issuer id, issuer name,
 issuer username, receiver id, receiver name, receiver username
 
+#### GET api/favor/count/:id
+
+gets the number of times you can make an oustanding favor from a favor with the input id
+
+returns json object with {remaining: number}
+
 ### api/category
 
 ---
