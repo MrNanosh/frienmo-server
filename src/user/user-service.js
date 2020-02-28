@@ -84,7 +84,6 @@ const UserService = {
       .first();
   },
   SearchUsers(db, username, user) {
-    //TODO: not return yourself
     return db
       .select('username', 'name', 'id')
       .from('user')

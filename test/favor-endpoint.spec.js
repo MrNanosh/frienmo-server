@@ -272,12 +272,6 @@ describe('Favor Endpoints', function () {
           .expect(async res => {
             let outCheck
             let favorCheck = await db.select('*').from('favor').where('id', 6).first();
-            //console.log(favorCheck);
-            //let outCheck = await db.select('*').from('outstanding').where('favor_id', 3).first();
-            //console.log(outCheck);
-            //check if the database for favor is right, and outstanding is right
-
-            //insert checks here
           });
       })
     })

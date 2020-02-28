@@ -64,7 +64,7 @@ describe('reviews Endpoints', function() {
       })
 
     })
-////////////////////////////////////////////////////////////////////
+
     describe(`GET /api/review/:id`, () => {
         beforeEach('insert Reviews', () =>
         helpers.seedReviewsTables(

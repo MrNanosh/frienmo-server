@@ -29,7 +29,6 @@ favorRouter
       limit,
       page
     );
-    //////////////////// this is req auth but without sending 401s back on failure
     const authToken =
       req.get('Authorization') || '';
 
@@ -71,7 +70,7 @@ favorRouter
   .post(
     jsonBodyParser,
     async (req, res) => {
-      //TODO: issuer could be anybody tighten validation
+      
 
       let {
         favor_id,
@@ -79,7 +78,7 @@ favorRouter
         receiver_id
       } = req.body;
 
-      //CHECK make sure this is the right kind of validation
+      
       if (
         !(req.user.id !== users_id) &&
         !(req.user.id !== receiver_id)
@@ -308,7 +307,7 @@ favorRouter
     '/redeem/:favor_id',
     jsonBodyParser,
     async (req, res) => {
-      //TODO: validate for the expiration date as well
+      
       //gets specific ticket
       const db = req.app.get('db');
       let { outstanding_id } = req.body;
@@ -330,9 +329,6 @@ favorRouter
           error: 'favor has expired'
         });
       }
-
-      // new Date(expiration_date).toLocaleString()
-      // new Date(currentFavor.expiration_date).toLocaleString()
 
       //favor must exist
       let ticket = await FavorService.getOutstanding(
@@ -365,7 +361,6 @@ favorRouter
         });
       }
 
-      //console.log(person, ticket);
       if (ticket.users_id === person) {
         if (
           ticket.receiver_redeemed ===
@@ -433,8 +428,6 @@ favorRouter
           throw new Error('protected');
         }
         let creator_id = req.user.id;
-        //TODO: validate tags
-        //TODO: handle tags
         if (!tags) {
           tags = '';
         }
@@ -442,7 +435,6 @@ favorRouter
           category = 1;
         }
         if (!expiration_date) {
-          //TODO: make sure the expiration is a later date
 
           expiration_date = add(
             Date.now(),
@@ -482,15 +474,14 @@ favorRouter
           req.app.get('db'),
           newFavor
         );
-        //TODO: ask the team about this
         let newOutstanding = {
           favor_id: favorRes[0].id,
           users_id:
-            favorRes[0].creator_id, //might be better as null by default
+            favorRes[0].creator_id, 
           receiver_id: null,
           receiver_redeemed: false,
           giver_redeemed: false
-        }; //uhhhhhhhhhhhhhhhh make sure this is right cause it might not be right (user vs receiver)
+        }; 
         let [
           outRes
         ] = await FavorService.insertOutstanding(
@@ -510,7 +501,7 @@ favorRouter
       } catch (error) {
         next(error);
       }
-    } ///make sure this is right
+    } 
   );
 
 favorRouter
@@ -608,7 +599,6 @@ favorRouter
         }
       }
     }
-    //TODO: add pagination?
 
     allOutstanding = FavorService.favorFilter(
       allOutstanding,
@@ -657,7 +647,6 @@ favorRouter
       );
 
       const currentFavor = favor[0]; //done for comparison purposes
-      //
       //dates must be larger
       if (expiration_date) {
         if (

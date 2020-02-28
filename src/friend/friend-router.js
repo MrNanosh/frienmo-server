@@ -28,7 +28,6 @@ friendRouter
         .status(400)
         .send('bad request');
     }
-    //TODO: needs to check to see if there is already an outstandin request and do an update instead
     const existing = await friendService.getFriendRequestById(req.app.get('db'), req.user.id, friend_id);
     if(!!existing){
       if (confirm.accepted) {
