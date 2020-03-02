@@ -1,6 +1,8 @@
-# Frenmo (working title)
+# Frenmo
 
 Team: Jack Pupel, Wendy Bartos, Angel Alicea, Javier Zapien, Dana Zinatbakhsh
+
+## Live Demo Link: https://frenmo.now.sh
 
 ## Summary
 
@@ -35,7 +37,6 @@ api github repo: https://github.com/MrNanosh/frienmo-server
 gets information about particular users
 returns username, name, phone, and description
 
-
 #### POST api/user/search
 
 takes username in the req body
@@ -53,12 +54,15 @@ body takes in username, name, password, phone number and description
 returns the location of the user, username, name, and id
 
 #### GET api/user/username/:username
+
 takes in username in params and searches the users table for a user
 returns 200 on success and 404 on failure
 
 ### api/friend
+
 all routes in friend require the user to be an authorized user
 otherwise it will return a 401
+
 ---
 
 #### GET api/friend
@@ -89,11 +93,14 @@ deletes the friend (not their account but the association)
 should be used in the event of declining a request for friend
 
 ```
+
 ```
 
 ### api/review
+
 all routes in friend require the user to be an authorized user
 will return a 401 otherwise
+
 ---
 
 #### GET api/review/user/:user_id
@@ -113,13 +120,15 @@ body requires comment and reviewee
 #### PATCH api/review/:id
 
 updates a review with the id in the params
-returns 204 and no data 
+returns 204 and no data
 
 #### DELETE api/review/:id
 
 deletes a review with the id in the params
 returns 204 and no data
+
 ```
+
 ```
 
 ### api/favor
@@ -137,21 +146,19 @@ if the favor doesnt exist it returns 401
 if the user is not within the publicity of the favor (ie: user is a friend when the favor is dm):
 returns a 403 error
 
-otherwise returns 200 and an object containing: 
+otherwise returns 200 and an object containing:
 favor_id, favor title, favor description, fa.category as category',
 favor expiration_date, favor publicity, favor user_location, favor tags,
 favor limit, outstanding id, outstanding receiver_redeemed,
 oustanding giver_redeemed as issuer_redeemed, creator id,
 creator name, creator username, issuer id, issuer name,
 issuer username, receiver id, receiver name, receiver username
-
-
 
 #### GET api/favor/friend
 
 gets favors that were posted among your friends and not just the general public
 
-otherwise returns 200 and an array of objects, each containing: 
+otherwise returns 200 and an array of objects, each containing:
 favor_id, favor title, favor description, fa.category as category',
 favor expiration_date, favor publicity, favor user_location, favor tags,
 favor limit, outstanding id, outstanding receiver_redeemed,
@@ -159,13 +166,12 @@ oustanding giver_redeemed as issuer_redeemed, creator id,
 creator name, creator username, issuer id, issuer name,
 issuer username, receiver id, receiver name, receiver username
 
-
 #### GET api/favor
 
 gets a list of favors from the local community.
-Does not show private or friend favors 
+Does not show private or friend favors
 
-returns 200 and an array of objects, each containing: 
+returns 200 and an array of objects, each containing:
 favor_id, favor title, favor description, fa.category as category',
 favor expiration_date, favor publicity, favor user_location, favor tags,
 favor limit, outstanding id, outstanding receiver_redeemed,
@@ -185,7 +191,7 @@ issuer username, receiver id, receiver name, receiver username
 
 gets favors that were posted directly to you
 
-returns 200 and an array of objects, each containing: 
+returns 200 and an array of objects, each containing:
 favor_id, favor title, favor description, fa.category as category',
 favor expiration_date, favor publicity, favor user_location, favor tags,
 favor limit, outstanding id, outstanding receiver_redeemed,
@@ -200,7 +206,7 @@ allowed: increase the expiration date of a favor that has receiver_id set
 allowed: update any field if favor_outstanding does not reference its id
 returns 400 if trying to do anything that isnt allowed
 
-takes in expiration_date, tags, category, user_location, limit in the req body 
+takes in expiration_date, tags, category, user_location, limit in the req body
 returns 204 on success
 
 ```
@@ -239,7 +245,7 @@ returns 204 on success
 #### DELETE api/favor/:id
 
 a user may deletes a favor
-takes in id in the params 
+takes in id in the params
 returns 204 in response
 
 ```
@@ -252,7 +258,7 @@ authorized post posts with the user as a creator of the favor but
 makes a null outstanding. Makes 1 outstanding favor with a value
 for the giver and receiver as null.
 
-takes title, description as required parts of the body returns 400 if those arent present 
+takes title, description as required parts of the body returns 400 if those arent present
 tags, category, expiration date, publicity, user location and limit as extra parts of the body
 
 returns 201 and the outstanding favor
@@ -265,7 +271,7 @@ returns 201 and the outstanding favor
 
 gets favors that were posted to the general public
 
-otherwise returns 200 and an array of objects, each containing: 
+otherwise returns 200 and an array of objects, each containing:
 favor_id, favor title, favor description, fa.category as category',
 favor expiration_date, favor publicity, favor user_location, favor tags,
 favor limit, outstanding id, outstanding receiver_redeemed,
